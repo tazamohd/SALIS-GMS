@@ -36,9 +36,11 @@ import {
   invoices,
   accountingConnections,
   accountingSync,
+  customerVehicles,
 } from "@shared/schema";
 import rateLimit from "express-rate-limit";
 import { setupAuth, isAuthenticated, hashPassword } from "./auth";
+import { resolvePrimaryPortal } from "./portal-routing";
 import { enforceQuota } from "./modules/quota";
 import { verifyBusiness } from "./services/verification/businessVerification";
 import { requireRole, requireAdmin, requireManagerOrAbove, requirePlatformAdmin } from "./middleware/requireRole";
@@ -514,12 +516,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userRoles = await storage.getUserRoles(user.id);
       const roles = userRoles.map((ur: any) => ur.role?.name).filter(Boolean);
       
-      // Determine primary portal based on user type or role
-      let primaryPortal = '/dashboard';
-      if (user.userType === 'technician') primaryPortal = '/technician-portal';
-      else if (roles.includes('Purchase Agent')) primaryPortal = '/purchase-agent';
-      else if (roles.includes('Call Center Agent')) primaryPortal = '/call-center';
-      else if (roles.includes('HR Manager') || roles.includes('HR Officer')) primaryPortal = '/hr-management';
+      // Where this user belongs. Shared with GET /api/user so the two session
+      // endpoints can never disagree about a user's home.
+      const primaryPortal = resolvePrimaryPortal(user, roles);
       
       const { password: _, ...userWithoutPassword } = user;
       res.json({
@@ -10284,8 +10283,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { jobCardId, mediaType, filename, base64Data } = req.body; // mediaType: 'photo' | 'video'
       
-      // In production, upload to S3/Cloudflare R2
-      // For now, return mock upload URL
+      // STUB — base64Data is discarded and this URL points at nothing. The
+      // object store this needs now exists (services/storage/objectStore.ts,
+      // used by routes/uploads.ts); wiring it up is deliberately NOT done here
+      // because the contract still has open product questions: videos exceed
+      // the 10MB cap and are outside the upload extension allowlist, and the
+      // jobCardId → documents linkage is unspecified. Settle those, then reuse
+      // objectStore.put() rather than inventing a second storage path.
       const uploadUrl = `https://storage.salis-auto.com/uploads/${jobCardId}/${filename}`;
       
       res.status(201).json({
@@ -14621,6 +14625,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Public: a customer signs up on the PLATFORM (not tied to any one garage) to
   // browse and use every provider. userType 'customer', no garageId.
+  // Optional first vehicle captured during signup. Anything the customer did
+  // not fill in is simply absent — only `make` is required to create a row.
+  const signupVehicleSchema = z.object({
+    make: z.string().trim().min(1).max(100),
+    model: z.string().trim().max(100).optional(),
+    year: z.coerce.number().int().min(1900).max(new Date().getFullYear() + 1).optional(),
+    licensePlate: z.string().trim().max(50).optional(),
+  });
+
   app.post('/api/customer/register', async (req, res) => {
     try {
       const { email, password, fullName, phone } = req.body ?? {};
@@ -14644,6 +14657,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userType: "customer",
         isActive: true,
       } as any);
+      // A vehicle given at signup saves the customer a second trip before they
+      // can book anything. A bad vehicle payload must not fail the signup —
+      // the account already exists — so it is reported, not thrown.
+      if (req.body?.vehicle) {
+        const parsedVehicle = signupVehicleSchema.safeParse(req.body.vehicle);
+        if (parsedVehicle.success) {
+          try {
+            await db.insert(customerVehicles).values({
+              ...parsedVehicle.data,
+              customerId: user.id,
+            } as any);
+          } catch (vehicleError) {
+            console.error("Customer registered but the signup vehicle failed to save:", vehicleError);
+          }
+        }
+      }
+
       req.login(user, (err) => {
         if (err) {
           console.error("Login error after customer registration:", err);

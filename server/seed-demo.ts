@@ -31,27 +31,44 @@ import { DEMO_ROLES, getDemoPassword, isDemoModeEnabled } from "./demo-config";
 const SALT_ROUNDS = 10;
 const DEMO_GARAGE_NAME = "SALIS AUTO Demo Garage";
 const DEMO_BRANCH_NAME = "Demo Main Branch";
+// The platform serves three business kinds; each demo owner persona needs a
+// business of the matching type or their portal has nothing to show.
+const DEMO_PARTS_STORE_NAME = "SALIS Demo Parts Store";
+const DEMO_INSURANCE_NAME = "SALIS Demo Insurance";
+
+/** Personas with no STANDARD_ROLE behind them; a missing RBAC link is expected. */
+const NON_RBAC_PERSONAS = new Set(["CUSTOMER", "PARTS_STORE_OWNER", "INSURANCE_OWNER"]);
 
 type UserRow = typeof users.$inferSelect;
 type RoleRow = typeof roles.$inferSelect;
 
-async function ensureDemoGarage() {
-  const [existing] = await db
-    .select()
-    .from(garages)
-    .where(eq(garages.name, DEMO_GARAGE_NAME))
-    .limit(1);
-  if (existing) return existing;
+async function ensureDemoBusiness(name: string, businessType: string, licenseNumber: string) {
+  const [existing] = await db.select().from(garages).where(eq(garages.name, name)).limit(1);
+  if (existing) {
+    // Demo businesses skip guided setup — otherwise every demo sign-in as an
+    // owner would land on the setup wizard instead of the thing being demoed.
+    if (!(existing as any).onboardingCompletedAt) {
+      const [updated] = await db
+        .update(garages)
+        .set({ onboardingCompletedAt: new Date() } as any)
+        .where(eq(garages.id, existing.id))
+        .returning();
+      return updated;
+    }
+    return existing;
+  }
 
   const [created] = await db
     .insert(garages)
     .values({
-      name: DEMO_GARAGE_NAME,
+      name,
       country: "Saudi Arabia",
       city: "Riyadh",
-      licenseNumber: "DEMO-GAR-001",
+      licenseNumber,
       isActive: true,
-    })
+      businessType,
+      onboardingCompletedAt: new Date(),
+    } as any)
     .returning();
   return created;
 }
@@ -95,7 +112,19 @@ export async function seedDemo(): Promise<void> {
   console.log("");
 
   // 2. Ensure a single demo garage + branch to scope all demo users.
-  const garage = await ensureDemoGarage();
+  const garage = await ensureDemoBusiness(DEMO_GARAGE_NAME, "garage", "DEMO-GAR-001");
+  const partsStore = await ensureDemoBusiness(DEMO_PARTS_STORE_NAME, "parts_store", "DEMO-PRT-001");
+  const insurer = await ensureDemoBusiness(DEMO_INSURANCE_NAME, "insurance", "DEMO-INS-001");
+
+  // Which business (if any) each demo persona belongs to. A marketplace
+  // customer belongs to none — a customer account is platform-wide, and giving
+  // one a garageId would misrepresent how customer sessions are scoped.
+  const businessFor = (roleKey: string): string | null => {
+    if (roleKey === "CUSTOMER") return null;
+    if (roleKey === "PARTS_STORE_OWNER") return partsStore.id;
+    if (roleKey === "INSURANCE_OWNER") return insurer.id;
+    return garage.id;
+  };
   const branch = await ensureDemoBranch(garage.id);
   console.log(`🏢 Demo garage: ${garage.name} (${garage.id})`);
   console.log(`📍 Demo branch: ${branch.name} (${branch.id})\n`);
@@ -123,7 +152,7 @@ export async function seedDemo(): Promise<void> {
       fullName: `Demo ${spec.roleName}`,
       userType: spec.userType,
       role: spec.guardRole,
-      garageId: garage.id,
+      garageId: businessFor(spec.roleKey),
       isActive: true,
     };
 
@@ -147,7 +176,7 @@ export async function seedDemo(): Promise<void> {
         branchId: branch.id,
         isPrimaryRole: true,
       });
-    } else {
+    } else if (!NON_RBAC_PERSONAS.has(spec.roleKey)) {
       console.warn(`  ⚠️  RBAC role "${spec.roleName}" not found — granular assignment skipped.`);
     }
 

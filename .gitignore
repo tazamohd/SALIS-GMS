@@ -80,3 +80,8 @@ server/routes/payments.routes.ts
 
 # Test coverage output
 coverage/
+
+# Cloudflare Tunnel: the live config and its credentials JSON are secrets.
+# Only cloudflared/config.example.yml belongs in git.
+/cloudflared/config.yml
+/cloudflared/*.json

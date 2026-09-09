@@ -1,0 +1,39 @@
+# Locally-managed Cloudflare Tunnel config.
+#
+# Use this variant when you want ingress rules in git instead of the dashboard
+# (the token-based alternative is docker-compose.tunnel.yml). Copy to
+# config.yml, fill in the two ids, and keep BOTH the copy and the credentials
+# JSON out of git — the credentials file is a long-lived tunnel secret.
+#
+# Setup:
+#   cloudflared tunnel login                     # browser OAuth, once per machine
+#   cloudflared tunnel create salis-gms          # prints the tunnel UUID
+#   cloudflared tunnel route dns salis-gms app.salis-auto.com
+#   cloudflared tunnel --config cloudflared/config.yml run
+#
+# `tunnel route dns` creates the proxied CNAME for you — do not also add an A
+# record for that hostname by hand or the two will fight.
+
+tunnel: 00000000-0000-0000-0000-000000000000
+credentials-file: /etc/cloudflared/00000000-0000-0000-0000-000000000000.json
+
+# Keep the connection warm across all four edge colos (the default).
+# protocol: quic
+
+ingress:
+  # The app serves both the API and the built SPA from one Node process, so a
+  # single rule covers the whole site.
+  - hostname: app.salis-auto.com
+    service: http://localhost:5000
+    originRequest:
+      # The origin is plain HTTP inside the tunnel; TLS terminates at the edge.
+      noTLSVerify: true
+      # Uploads are capped at 10MB (routes/uploads.ts) but slow mobile links
+      # still need headroom above the 30s default.
+      connectTimeout: 30s
+      # Server-Sent Events / long-poll endpoints must not be cut off mid-stream.
+      disableChunkedEncoding: false
+
+  # Required final rule: anything not matched above gets a 404 rather than
+  # being forwarded somewhere unintended.
+  - service: http_status:404

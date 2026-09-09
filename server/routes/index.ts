@@ -11,6 +11,8 @@ import { enforceRoutePolicy } from "../middleware/routePolicy";
 import { enforceGarageScopeOnQuery, enforceTenantOnBody } from "../middleware/garageScope";
 import { generateCsrfToken, csrfTokenRoute, enforceCsrf } from "../middleware/csrf";
 import { authRoutes } from "./auth";
+import { staffAccessRoutes } from "./staff-access";
+import { businessOnboardingRoutes } from "./business-onboarding";
 import publicRoutes from "./public";
 import predictiveMaintenanceRoutes from "./predictive-maintenance";
 import partsRecommendationsRoutes from "./parts-recommendations";
@@ -222,6 +224,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Load new modular routes with priority
   app.use("/api", authRoutes);
+
+  // Portal access: staff invites / workplace applications (public redeem +
+  // business-side management) and the guided business setup.
+  app.use("/api", staffAccessRoutes);
+  console.log("Staff Access Routes Loaded");
+  app.use("/api", businessOnboardingRoutes);
+  console.log("Business Onboarding Routes Loaded");
   // Smart Search routes
   app.use("/api", searchRoutes);
   console.log("Smart Search Routes Loaded");

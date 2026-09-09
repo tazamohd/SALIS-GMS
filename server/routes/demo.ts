@@ -43,6 +43,8 @@ router.get("/demo/accounts", (_req, res) => {
       email: r.email,
       label: r.label,
       description: r.description,
+      // Lets each portal login page show only the accounts that belong to it.
+      portals: r.portals,
     })),
   });
 });

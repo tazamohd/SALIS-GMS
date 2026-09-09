@@ -76,6 +76,27 @@ export const garages = pgTable("garages", {
   email: varchar("email", { length: 255 }),
   address: text("address"),
   photoUrl: text("photo_url"),
+  // ── Business identity & onboarding (self-service setup) ──────────────────
+  // Official identifiers, carried over from the approved application so the
+  // business does not have to type them again, and reused on every printed
+  // document (ZATCA requires the seller VAT number on tax invoices).
+  taxNumber: varchar("tax_number", { length: 20 }),
+  commercialRegistration: varchar("commercial_registration", { length: 20 }),
+  // Branding applied to the portal header and every printed document.
+  logoUrl: text("logo_url"),
+  brandPrimaryColor: varchar("brand_primary_color", { length: 20 }),
+  brandSecondaryColor: varchar("brand_secondary_color", { length: 20 }),
+  // Print/invoice preferences: paper size, footer text, terms, show-logo, the
+  // template id, and any per-document toggles. A jsonb blob because the set of
+  // knobs is presentational and expected to grow.
+  invoiceSettings: jsonb("invoice_settings"),
+  // Where the business is in the guided setup, so it can be resumed.
+  onboardingStep: varchar("onboarding_step", { length: 40 }),
+  onboardingCompletedAt: timestamp("onboarding_completed_at"),
+  // Public workplace code a prospective employee types on /staff/apply. It
+  // identifies the business only — it never grants access on its own; the owner
+  // still approves each application.
+  staffJoinCode: varchar("staff_join_code", { length: 12 }).unique(),
 });
 
 // Customer reviews of marketplace providers (C3). One review per customer per
@@ -11323,6 +11344,10 @@ export const garageApplications = pgTable("garage_applications", {
   taxNumber: varchar("tax_number", { length: 20 }), // ZATCA VAT: 15 digits, starts with 3
   commercialRegistration: varchar("commercial_registration", { length: 20 }), // Sejel/CR: 10 digits
   isDemo: boolean("is_demo").default(false).notNull(), // trial account, verification bypassed
+  // Provider-type-specific answers collected at signup (bay count for a garage,
+  // brands carried for a parts store, SAMA licence for an insurer, …). Kept as
+  // jsonb because the question set differs per provider type and evolves.
+  metadata: jsonb("metadata"),
   status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | approved | rejected
   // Automated verification outcome (format + registry check).
   verificationStatus: varchar("verification_status", { length: 20 }).default("unverified").notNull(), // unverified | verified | failed | manual_review
@@ -11339,6 +11364,59 @@ export const garageApplications = pgTable("garage_applications", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
   statusIdx: index("garage_applications_status_idx").on(table.status),
+}));
+
+// ── Staff access ───────────────────────────────────────────────────────────
+// Employees never self-mint a staff account: they either redeem an invite the
+// business issued (staff_invites) or apply with the workplace's public code and
+// wait for the owner to approve (staff_applications). Both paths end in the
+// same place — a user row with the role the business chose, scoped to its
+// garage — but neither lets the applicant pick their own privileges.
+export const staffInvites = pgTable("staff_invites", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  branchId: uuid("branch_id").references(() => branches.id),
+  // The code the invitee types. Random, unguessable, unique.
+  code: varchar("code", { length: 24 }).notNull().unique(),
+  // Optional lock to one address: when set, only this email may redeem it.
+  email: varchar("email", { length: 255 }),
+  // RBAC role key (STANDARD_ROLES, e.g. "TECHNICIAN") + the coarse guard role
+  // the route guards understand. Both are chosen by the inviting admin.
+  roleKey: varchar("role_key", { length: 50 }).notNull(),
+  guardRole: varchar("guard_role", { length: 20 }).notNull(),
+  userType: varchar("user_type", { length: 50 }),
+  maxUses: integer("max_uses").default(1).notNull(),
+  usedCount: integer("used_count").default(0).notNull(),
+  expiresAt: timestamp("expires_at"),
+  revokedAt: timestamp("revoked_at"),
+  createdBy: varchar("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  garageIdx: index("staff_invites_garage_idx").on(table.garageId),
+}));
+
+export const staffApplications = pgTable("staff_applications", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  garageId: uuid("garage_id").notNull().references(() => garages.id),
+  fullName: varchar("full_name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  // What the applicant says they do — a request, not a grant. The approver
+  // picks the role that is actually assigned.
+  requestedRoleKey: varchar("requested_role_key", { length: 50 }),
+  message: text("message"),
+  // Hashed at submit so approval can provision the login without a second
+  // round-trip to the applicant.
+  passwordHash: varchar("password_hash", { length: 255 }),
+  status: varchar("status", { length: 20 }).default("pending").notNull(), // pending | approved | rejected
+  reviewedBy: varchar("reviewed_by").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  rejectionReason: text("rejection_reason"),
+  provisionedUserId: varchar("provisioned_user_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  garageStatusIdx: index("staff_applications_garage_status_idx").on(table.garageId, table.status),
 }));
 
 // Customer marketplace — a platform customer's own vehicles (garage-agnostic).
@@ -11679,3 +11757,34 @@ export const insertGosiConfigSchema = createInsertSchema(gosiConfig).omit({ id: 
 export type GatePass = typeof gatePasses.$inferSelect;
 export type InsertGatePass = typeof gatePasses.$inferInsert;
 export const insertGatePassSchema = createInsertSchema(gatePasses).omit({ id: true, issuedAt: true });
+
+export type StaffInvite = typeof staffInvites.$inferSelect;
+export type InsertStaffInvite = typeof staffInvites.$inferInsert;
+// Admin-issued invite — the server owns the code, the counters and the audit
+// columns, so the request body may only choose who/what the invite is for.
+export const insertStaffInviteSchema = createInsertSchema(staffInvites).omit({
+  id: true,
+  code: true,
+  garageId: true,
+  usedCount: true,
+  revokedAt: true,
+  createdBy: true,
+  createdAt: true,
+});
+
+export type StaffApplication = typeof staffApplications.$inferSelect;
+export type InsertStaffApplication = typeof staffApplications.$inferInsert;
+// Public "apply to my workplace" intake: identity + what they say they do.
+// Everything about the outcome is server-side.
+export const insertStaffApplicationSchema = createInsertSchema(staffApplications).omit({
+  id: true,
+  garageId: true,
+  passwordHash: true,
+  status: true,
+  reviewedBy: true,
+  reviewedAt: true,
+  rejectionReason: true,
+  provisionedUserId: true,
+  createdAt: true,
+  updatedAt: true,
+});

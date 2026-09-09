@@ -29,6 +29,13 @@
       "when": 1786191118512,
       "tag": "0003_licensing_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788669815246,
+      "tag": "0004_portal_access",
+      "breakpoints": true
     }
   ]
 }

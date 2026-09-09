@@ -310,6 +310,8 @@ export const navigationConfig: NavGroup[] = [
     items: [
       { title: "Subscription", href: "/subscriptions", icon: CreditCard, roles: ['ADMIN', 'MANAGER'] },
       { title: "Settings", href: "/settings", icon: Settings },
+      { title: "Business Setup", href: "/onboarding", icon: Building2, roles: ['ADMIN', 'MANAGER'] },
+      { title: "Team Access", href: "/staff-access", icon: UserCog, roles: ['ADMIN', 'MANAGER'] },
       { title: "Backup & Export", href: "/data-backup", icon: Database, roles: ['ADMIN', 'MANAGER'] },
       { title: "Profile", href: "/profile", icon: UserIcon },
       { title: "Notifications", href: "/notifications", icon: Bell },

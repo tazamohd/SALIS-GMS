@@ -19,6 +19,7 @@ import ClientDashboard from "@/pages/client/Dashboard";
 import { CustomerMobileLayout } from "@/components/CustomerMobileLayout";
 import { TechnicianMobileLayout } from "@/components/TechnicianMobileLayout";
 import { useAuth } from "@/hooks/useAuth";
+import { resolveUserHome } from "@/config/portals";
 import { UndoRedoProvider } from "@/contexts/UndoRedoContext";
 import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -218,6 +219,15 @@ const CustomerCommunications = lazy(() => import("@/pages/customer/CustomerCommu
 const CustomerPortal = lazy(() => import("@/pages/CustomerPortal"));
 const Register = lazy(() => import("@/pages/Register"));
 const ProviderSignup = lazy(() => import("@/pages/ProviderSignup"));
+// Per-audience access pages (chooser, portal-specific login + registration).
+const PortalChooser = lazy(() => import("@/pages/access/PortalChooser"));
+const PortalLogin = lazy(() => import("@/pages/access/PortalLogin"));
+const CustomerRegister = lazy(() => import("@/pages/access/CustomerRegister"));
+const BusinessRegister = lazy(() => import("@/pages/access/BusinessRegister"));
+const StaffJoin = lazy(() => import("@/pages/access/StaffJoin"));
+const StaffApply = lazy(() => import("@/pages/access/StaffApply"));
+const BusinessOnboarding = lazy(() => import("@/pages/access/BusinessOnboarding"));
+const StaffAccessAdmin = lazy(() => import("@/pages/StaffAccessAdmin"));
 const CustomerSignup = lazy(() => import("@/pages/CustomerSignup"));
 const Marketplace = lazy(() => import("@/pages/Marketplace"));
 const MyVehicles = lazy(() => import("@/pages/MyVehicles"));
@@ -316,6 +326,18 @@ function Router() {
         <Route path="/otp" component={OTPVerification} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
+
+        {/* Portal access — one entry per audience. The legacy /login and
+            /register above stay as-is so existing links keep working. */}
+        <Route path="/portals" component={PortalChooser} />
+        <Route path="/customer/login">{() => <PortalLogin portalId="customer" />}</Route>
+        <Route path="/customer/register" component={CustomerRegister} />
+        <Route path="/business/login">{() => <PortalLogin fromQuery />}</Route>
+        <Route path="/business/register" component={BusinessRegister} />
+        <Route path="/staff/login">{() => <PortalLogin portalId="staff" />}</Route>
+        <Route path="/staff/join" component={StaffJoin} />
+        <Route path="/staff/apply" component={StaffApply} />
+
         <Route path="/provider-signup" component={ProviderSignup} />
         <Route path="/join" component={ProviderSignup} />
         <Route path="/customer-signup" component={CustomerSignup} />
@@ -323,11 +345,13 @@ function Router() {
         <Route path="/track/:token" component={PublicTracking} />
         <Route path="/customer-portal" component={CustomerPortal} />
         {/* First-run: unrecognized paths show language selection until the
-            visitor has been through it once, then default to Login. */}
+            visitor has been through it once, then the portal chooser — the
+            platform serves several audiences, so "who are you?" comes before
+            any one login form. */}
         <Route>
           {() =>
             localStorage.getItem("salis-onboarding-done") ? (
-              <Login />
+              <PortalChooser />
             ) : (
               <Redirect to="/language" />
             )
@@ -344,10 +368,17 @@ function Router() {
   return (
     <Suspense fallback={<PageSkeleton />}>
     <Switch>
-      {/* Root path - show dashboard directly */}
+      {/* Root path — send each audience to its own home instead of showing
+          every signed-in user the garage dashboard. */}
       <Route path="/">
+        {() => <Redirect to={resolveUserHome(user as any)} />}
+      </Route>
+
+      {/* Guided business setup + the business-side staff access console. */}
+      <Route path="/onboarding" component={BusinessOnboarding} />
+      <Route path="/staff-access">
         <Layout>
-          <Dashboard />
+          <StaffAccessAdmin />
         </Layout>
       </Route>
 

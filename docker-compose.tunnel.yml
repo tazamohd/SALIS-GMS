@@ -1,0 +1,42 @@
+# Cloudflare Tunnel overlay — publishes the compose stack on a real hostname
+# without opening a single inbound port.
+#
+#   export CLOUDFLARE_TUNNEL_TOKEN=<token from the Zero Trust dashboard>
+#   docker compose -f docker-compose.yml -f docker-compose.tunnel.yml up -d
+#
+# The tunnel dials OUT to Cloudflare's edge, so the host needs no public IP, no
+# port-forward, and no inbound firewall rule. Traffic arrives at the edge over
+# HTTPS and is handed to `app:5000` on the compose network.
+#
+# This is the "remotely-managed" tunnel: ingress rules live in the dashboard
+# (Zero Trust → Networks → Tunnels → your tunnel → Published application
+# routes). For a config-file tunnel instead, see cloudflared/config.example.yml.
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    # --no-autoupdate: the container is the update unit; an in-place self-update
+    # would silently diverge from the pinned image.
+    command: tunnel --no-autoupdate run
+    environment:
+      # Fails fast with this message rather than starting a tunnel with no token.
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN (Zero Trust → Networks → Tunnels)}
+    depends_on:
+      - app
+
+  app:
+    environment:
+      # HTTPS terminates at Cloudflare's edge and the origin hop is inside the
+      # tunnel, so the browser only ever speaks HTTPS — Secure cookies are
+      # correct here, unlike the plain-HTTP localhost demo in the base file.
+      SESSION_COOKIE_SECURE: "true"
+      # (Express already runs with `trust proxy = 1` — server/index.ts:26 and
+      # server/auth.ts:89 — so X-Forwarded-Proto from the edge is honoured and
+      # Secure cookies are actually set. No env var needed.)
+      # Public origin used in generated links/emails. Match the tunnel hostname.
+      APP_URL: ${APP_URL:-https://app.salis-auto.com}
+    # NOTE: the base file still publishes 5000 on the host. Once the tunnel is
+    # the only intended entry point, drop that mapping so the app is not also
+    # reachable directly on the LAN:
+    #   ports: !reset []          # Compose v2.24+
+    # or run without the base file's port mapping.

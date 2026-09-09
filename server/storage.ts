@@ -13690,6 +13690,15 @@ export class DatabaseStorage implements IStorage {
           isActive: true,
           subscriptionPlan: app.requestedPlan,
           businessType: app.providerType ?? "garage",
+          // Carry the verified identifiers over so the business never retypes
+          // them — they are printed on every tax invoice.
+          taxNumber: app.taxNumber,
+          commercialRegistration: app.commercialRegistration,
+          email: app.email,
+          phone: app.phone,
+          // Start the guided setup at its first step; the owner is sent
+          // straight there on first sign-in.
+          onboardingStep: "identity",
         } as any)
         .returning();
 

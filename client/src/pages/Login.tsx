@@ -164,6 +164,16 @@ export default function Login() {
                   {t('auth.register', 'Register')}
                 </Link>
               </p>
+              <p className="text-center text-sm font-poppins text-[#64748B] dark:text-[#9BA4B0]">
+                {t('auth.notSureWhere', 'Not sure where to sign in?')}{" "}
+                <Link
+                  href="/portals"
+                  className="text-[#0A5ED7] dark:text-[#0BB3FF] hover:underline font-semibold"
+                  data-testid="link-portals"
+                >
+                  {t('auth.chooseYourPortal', 'Choose your portal')}
+                </Link>
+              </p>
               <div className="flex items-center justify-center gap-3 text-xs font-poppins text-[#64748B] dark:text-[#9BA4B0]">
                 <Link href="/marketplace" className="hover:text-[#0A5ED7] dark:hover:text-[#0BB3FF]" data-testid="link-marketplace">Browse marketplace</Link>
                 <span>·</span>

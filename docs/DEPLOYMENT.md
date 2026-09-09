@@ -53,6 +53,19 @@ required variable is missing, and (in production) if a hard security check fails
 
 Never commit secrets. Inject via the platform's secret manager / CI secrets.
 
+**File storage**
+
+| Var | Purpose |
+|---|---|
+| `STORAGE_DRIVER` | `local` (default, disk under `UPLOAD_DIR`) or `r2` (Cloudflare R2 bucket) |
+| `R2_ACCOUNT_ID` / `R2_BUCKET` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | required when `STORAGE_DRIVER=r2`; the server **exits at boot** if any is missing |
+| `R2_PREFIX` / `R2_ENDPOINT` | optional key prefix / endpoint override |
+
+> **Deploying to a container or PaaS? Set `STORAGE_DRIVER=r2`.** The local driver
+> writes to the instance filesystem, so every upload is lost on redeploy. Full
+> walkthrough — plus DNS, CDN, and Tunnel setup — in
+> [deployment/cloudflare.md](deployment/cloudflare.md).
+
 ## 3. Build & release
 
 ```bash

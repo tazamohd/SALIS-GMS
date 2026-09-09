@@ -42,7 +42,7 @@ deploy env) · **Status**: `Integrated` (code complete, awaiting creds) /
 | 11 | **Payment gateway** | Yes | ✅×7 | ✅ | ☐ | ☐ | Integrated: Moyasar, HyperPay, Tap, Tabby, Tamara, PayPal, Stripe (`services/payments/providers/*`, unified webhook-verify); awaiting merchant + prod approval |
 | 12 | **ZATCA e-invoicing** (KSA) | Yes (KSA) | ✅ | ✅ | ☐ | ☐ | Integrated (`zatca-phase2.ts`, `zatca-signing.ts`, QR/XML); awaiting CSID onboarding + certificates |
 | 13 | **OpenAI** (AI features) | Optional | ✅ | ✅ | ☐ | ☐ | Integrated (`ai` module, `OPENAI_API_KEY`); degrades to 500/preset without key |
-| 14 | Cloud storage (S3/Azure/GCS/R2) | Optional | ❌ | ❌ | ☐ | ☐ | Not integrated (local FS today) |
+| 14 | **Cloud storage** (Cloudflare R2) | Optional ⚠ | ✅ | ✅ | ☐ | ☐ | Integrated (`services/storage/objectStore.ts`, `STORAGE_DRIVER=r2` + `R2_*`); defaults to local disk. **Effectively required on any ephemeral-filesystem host** — local uploads are lost on redeploy. Awaiting bucket + R2 API token |
 | 15 | **Redis** (cache/queue) | Optional | ❌ | ❌ | ☐ | ☐ | Not integrated — no Redis client; sessions/cache on PG today |
 | 16 | **PostgreSQL** | Yes | ✅ | ✅ | ☐ | n/a | Integrated (`DATABASE_URL`, Drizzle); required — validated at boot |
 | 17 | OCR (Google Vision / OpenAI Vision) | Optional | ✅ | ✅ | ☐ | ☐ | Integrated (`services/ocr/imageOcr.ts`, `GOOGLE_VISION_API_KEY`) |

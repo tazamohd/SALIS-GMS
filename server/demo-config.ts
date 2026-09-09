@@ -19,7 +19,15 @@
  */
 import { STANDARD_ROLES } from "./rbac-config";
 
-export type GuardRole = "ADMIN" | "MANAGER" | "ADVISOR" | "TECHNICIAN" | "ACCOUNTANT";
+export type GuardRole = "ADMIN" | "MANAGER" | "ADVISOR" | "TECHNICIAN" | "ACCOUNTANT" | "CUSTOMER";
+
+/**
+ * Which portal login page offers a given demo account. The platform has one
+ * entry per audience, so the quick-pick has to be filtered — a car owner
+ * should not be offered "Demo Warehouse Manager", and the garage owner
+ * persona belongs on the business page, not the customer one.
+ */
+export type DemoPortal = "customer" | "garage" | "parts_store" | "insurance" | "staff";
 
 /** Every STANDARD_ROLES key — used to keep the curated personas type-safe. */
 type RoleKey = keyof typeof STANDARD_ROLES;
@@ -39,6 +47,8 @@ export interface DemoRoleSpec {
   label: string;
   /** One-line description of what this persona can do, shown under the label. */
   description: string;
+  /** Portal login pages that offer this account. */
+  portals: DemoPortal[];
 }
 
 /** Domain used for the deterministic, non-routable demo emails. */
@@ -54,6 +64,7 @@ interface DemoPersona {
   userType: string;
   label: string;
   description: string;
+  portals: DemoPortal[];
 }
 
 /**
@@ -69,6 +80,7 @@ const CURATED_PERSONAS: readonly DemoPersona[] = [
     userType: "admin",
     label: "Business Owner",
     description: "Full access — every module across the garage",
+    portals: ["garage", "staff"],
   },
   {
     roleKey: "GENERAL_MANAGER",
@@ -76,6 +88,7 @@ const CURATED_PERSONAS: readonly DemoPersona[] = [
     userType: "manager",
     label: "General Manager",
     description: "Operations, staff, reports & dashboards",
+    portals: ["garage", "staff"],
   },
   {
     roleKey: "SERVICE_ADVISOR",
@@ -83,6 +96,7 @@ const CURATED_PERSONAS: readonly DemoPersona[] = [
     userType: "advisor",
     label: "Service Advisor",
     description: "Front desk — customers, jobs & estimates",
+    portals: ["staff"],
   },
   {
     roleKey: "TECHNICIAN",
@@ -90,6 +104,7 @@ const CURATED_PERSONAS: readonly DemoPersona[] = [
     userType: "technician",
     label: "Technician",
     description: "Workshop — assigned jobs & inspections",
+    portals: ["staff"],
   },
   {
     roleKey: "ACCOUNTANT",
@@ -97,6 +112,7 @@ const CURATED_PERSONAS: readonly DemoPersona[] = [
     userType: "accountant",
     label: "Accountant",
     description: "Invoices, payments & financial reports",
+    portals: ["staff"],
   },
 ];
 
@@ -133,6 +149,7 @@ export const DEMO_ROLES: DemoRoleSpec[] = [
     email: `${(persona.roleKey as string).toLowerCase()}@${DEMO_EMAIL_DOMAIN}`,
     label: persona.label,
     description: persona.description,
+    portals: persona.portals,
   })),
   ...Object.entries(ROLE_GUARD_MAP).map(([roleKey, mapping]) => {
     const role = STANDARD_ROLES[roleKey as RoleKey] as { name: string; description: string };
@@ -144,8 +161,47 @@ export const DEMO_ROLES: DemoRoleSpec[] = [
       email: `${roleKey.toLowerCase()}@${DEMO_EMAIL_DOMAIN}`,
       label: role.name,
       description: role.description,
+      // Every remaining STANDARD_ROLE is an employee of a business, so it
+      // belongs on the team-member portal. The two stock-facing roles are also
+      // offered on the parts-store portal, which is the business they run.
+      portals: (roleKey === "WAREHOUSE_MANAGER" || roleKey === "PARTS_MANAGER"
+        ? ["staff", "parts_store"]
+        : ["staff"]) as DemoPortal[],
     };
   }),
+  // Audiences that have no STANDARD_ROLE behind them: a marketplace car owner,
+  // and the owner personas for the two non-garage business types. They are
+  // seeded like any other demo account (the RBAC link is simply skipped).
+  {
+    roleKey: "CUSTOMER",
+    roleName: "Customer",
+    guardRole: "CUSTOMER" as GuardRole,
+    userType: "customer",
+    email: `customer@${DEMO_EMAIL_DOMAIN}`,
+    label: "Car Owner",
+    description: "Book service, track repairs, manage vehicles",
+    portals: ["customer"] as DemoPortal[],
+  },
+  {
+    roleKey: "PARTS_STORE_OWNER",
+    roleName: "Parts Store Owner",
+    guardRole: "ADMIN" as GuardRole,
+    userType: "admin",
+    email: `parts_store_owner@${DEMO_EMAIL_DOMAIN}`,
+    label: "Parts Store Owner",
+    description: "Catalogue, incoming orders and fulfilment",
+    portals: ["parts_store"] as DemoPortal[],
+  },
+  {
+    roleKey: "INSURANCE_OWNER",
+    roleName: "Insurance Manager",
+    guardRole: "ADMIN" as GuardRole,
+    userType: "admin",
+    email: `insurance_owner@${DEMO_EMAIL_DOMAIN}`,
+    label: "Insurance Manager",
+    description: "Claims, quotes and the accredited garage network",
+    portals: ["insurance"] as DemoPortal[],
+  },
 ];
 
 /** Look up a demo spec by its STANDARD_ROLE key (case-insensitive). */

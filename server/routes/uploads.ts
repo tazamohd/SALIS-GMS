@@ -7,9 +7,15 @@
  *                              Management page list/stats), returns metadata.
  *   GET  /api/uploads/:id    → streams the file back (tenant-scoped; cross-tenant = 404)
  *
- * Storage: multer disk storage under UPLOAD_DIR (default ./uploads, created if
- * missing). The stored filename is `${randomUUID()}.${sanitized ext}` — the
- * client-supplied filename is NEVER used for the on-disk path (path traversal).
+ * Storage: multer writes to a staging dir, then the file is handed to the
+ * configured object store (`STORAGE_DRIVER`: local disk under UPLOAD_DIR, or a
+ * Cloudflare R2 bucket — see services/storage/objectStore.ts). The stored key is
+ * `${randomUUID()}.${sanitized ext}` — the client-supplied filename is NEVER
+ * used for the stored key (path traversal).
+ *
+ * Downloads always stream back through this route, on both drivers, so the
+ * tenant guard below stays the only path to a file. R2 objects are never made
+ * public and are never presigned.
  *
  * Tenant guard: global `requireAuthByDefault` enforces auth; every DB read/write
  * here is scoped via resolveGarageScope (same pattern as the modular routes).
@@ -28,6 +34,7 @@ import { storage } from "../storage";
 import { isAuthenticated } from "../auth";
 import { resolveGarageScope, isCrossGarageRole } from "../middleware/garageScope";
 import { logger } from "../logger";
+import { objectStore, STAGING_DIR, ensureDir } from "../services/storage/objectStore";
 
 const router = Router();
 
@@ -83,8 +90,6 @@ const ALLOWED_MIME_BY_EXT: Record<string, string[]> = {
   txt: ["text/plain"],
 };
 
-const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR || path.join(process.cwd(), "uploads"));
-
 /**
  * Per-user upload throttle (security review HIGH-2: disk-exhaustion DoS).
  * Same express-rate-limit library as the global limiters in server/index.ts.
@@ -102,12 +107,15 @@ const uploadsLimiter = rateLimit({
   message: { error: "Too many uploads — try again later" },
 });
 
-function ensureUploadDir(): void {
-  if (!fs.existsSync(UPLOAD_DIR)) {
-    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-  }
+/**
+ * Multer stages here; the object store then moves (local) or uploads (r2) the
+ * file. Staging first means a half-written upload never appears as a stored
+ * object, on either driver.
+ */
+function ensureStagingDir(): void {
+  ensureDir(STAGING_DIR);
 }
-ensureUploadDir();
+ensureStagingDir();
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -140,8 +148,8 @@ const idParamSchema = z.string().uuid();
 
 const diskStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    ensureUploadDir();
-    cb(null, UPLOAD_DIR);
+    ensureStagingDir();
+    cb(null, STAGING_DIR);
   },
   filename: (_req, file, cb) => {
     const ext = allowedExtension(file.originalname);
@@ -217,6 +225,9 @@ router.post(
   handleUploadErrors,
   async (req: Request, res: Response) => {
     const file = req.file;
+    // Set once the object store owns the file, so the catch below can roll the
+    // stored object back when the DB write (the source of truth) fails.
+    let storedKey: string | null = null;
     try {
       if (!file) {
         return res.status(400).json({ error: "A file is required (multipart field 'file')" });
@@ -250,6 +261,13 @@ router.post(
         .map((t) => t.trim())
         .filter(Boolean);
 
+      // Hand the staged file to the configured store (local move / R2 upload)
+      // before writing the row, so a documents row never points at an object
+      // that failed to store.
+      const storageKey = path.basename(file.path);
+      await objectStore.put(storageKey, file.path, file.mimetype);
+      storedKey = storageKey;
+
       // Tenant-scoped file record (the source of truth for downloads).
       const [doc] = await db
         .insert(documents)
@@ -257,7 +275,7 @@ router.post(
           garageId,
           documentName: parsed.data.name || displayName,
           description: parsed.data.description,
-          fileUrl: path.basename(file.path), // stored name only; resolved against UPLOAD_DIR
+          fileUrl: storageKey, // opaque key; resolved by the object store
           fileName: displayName,
           fileSize: file.size,
           mimeType: file.mimetype,
@@ -300,6 +318,13 @@ router.post(
       });
     } catch (error) {
       removeQuietly(file?.path);
+      // Roll back the stored object when the row that would reference it never
+      // landed — otherwise it is unreachable garbage nothing will ever delete.
+      if (storedKey) {
+        objectStore.delete(storedKey).catch(() => {
+          // Best-effort; already logged inside the store.
+        });
+      }
       logger.error("uploads: create failed", { error: String(error) });
       return res.status(500).json({ error: "Failed to store upload" });
     }
@@ -324,17 +349,47 @@ router.get("/uploads/:id", isAuthenticated, async (req: Request, res: Response) 
       return res.status(404).json({ error: "Upload not found" });
     }
 
-    // Defense in depth: only ever serve basenames resolved inside UPLOAD_DIR.
+    // Defense in depth: the key is always reduced to a basename before it
+    // reaches the store, which resolves it inside UPLOAD_DIR / the R2 prefix.
     const storedName = path.basename(doc.fileUrl || "");
-    const absPath = path.resolve(UPLOAD_DIR, storedName);
-    if (!storedName || !absPath.startsWith(UPLOAD_DIR + path.sep)) {
+    if (!storedName) {
       return res.status(404).json({ error: "Upload not found" });
     }
-    if (!fs.existsSync(absPath)) {
-      return res.status(404).json({ error: "Upload file is missing from storage" });
+    const downloadName = doc.fileName || storedName;
+
+    // Local files keep going through res.download(): it handles range requests
+    // and Content-Length, which a hand-rolled stream would drop.
+    const absPath = objectStore.localPath(storedName);
+    if (absPath) {
+      if (!fs.existsSync(absPath)) {
+        return res.status(404).json({ error: "Upload file is missing from storage" });
+      }
+      return res.download(absPath, downloadName);
     }
 
-    return res.download(absPath, doc.fileName || storedName);
+    // Remote driver (R2): proxy the object so the tenant guard above stays the
+    // only way to reach it. Never redirect to a public or presigned URL.
+    const stream = await objectStore.createReadStream(storedName);
+    if (!stream) {
+      return res.status(404).json({ error: "Upload file is missing from storage" });
+    }
+    // Force download semantics: the stored bytes are user-supplied, so they must
+    // never be sniffed into an inline-rendered document.
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Content-Type", doc.mimeType || "application/octet-stream");
+    // downloadName came from sanitizeDisplayName() ([a-zA-Z0-9._ -] only), so
+    // it cannot break out of the quoted string.
+    res.setHeader("Content-Disposition", `attachment; filename="${downloadName}"`);
+    if (doc.fileSize) res.setHeader("Content-Length", String(doc.fileSize));
+
+    stream.on("error", (streamErr) => {
+      logger.error("uploads: stream failed", { error: String(streamErr) });
+      // Headers are already sent once bytes flow; destroying the socket is the
+      // only honest signal that the body is truncated.
+      if (!res.headersSent) res.status(500).json({ error: "Failed to download upload" });
+      else res.destroy();
+    });
+    return stream.pipe(res);
   } catch (error) {
     logger.error("uploads: download failed", { error: String(error) });
     return res.status(500).json({ error: "Failed to download upload" });

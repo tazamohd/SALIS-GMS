@@ -19,6 +19,9 @@ declare global {
   namespace Express {
     interface User extends Omit<import("@shared/schema").User, "password"> {
       subscriptionPlan?: string;
+      /** False while the owning business still has guided setup to finish. */
+      onboardingCompleted?: boolean;
+      businessType?: string;
     }
   }
 }
@@ -137,6 +140,11 @@ export async function setupAuth(app: Express) {
       
       // Enrich user with subscription plan from garage (Drizzle returns camelCase)
       let subscriptionPlan = 'STARTER';
+      // Whether the owning business has finished guided setup. Read from the
+      // garage row that is already being fetched here, so routing a brand-new
+      // business to /onboarding costs no extra query.
+      let onboardingCompleted = true;
+      let businessType: string | undefined;
       const garageId = (user as any).garageId;
       if (garageId) {
         try {
@@ -145,12 +153,16 @@ export async function setupAuth(app: Express) {
           if (garage && (garage as any).subscriptionPlan) {
             subscriptionPlan = (garage as any).subscriptionPlan;
           }
+          if (garage) {
+            onboardingCompleted = (garage as any).onboardingCompletedAt != null;
+            businessType = (garage as any).businessType;
+          }
         } catch (garageError) {
           console.error('Error fetching garage for subscription plan:', garageError);
         }
       }
       
-      const enrichedUser = { ...user, subscriptionPlan };
+      const enrichedUser = { ...user, subscriptionPlan, onboardingCompleted, businessType };
       // Redact sensitive fields before placing in session/req.user
       const { password: _password, passwordHash: _passwordHash, ...safeUser } = enrichedUser as any;
       console.log('deserializeUser - enriched subscriptionPlan:', subscriptionPlan);

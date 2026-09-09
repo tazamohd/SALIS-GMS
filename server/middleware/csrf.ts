@@ -49,6 +49,9 @@ const CSRF_EXEMPT_PATTERNS: RegExp[] = [
   /^\/api\/kiosk\//,
   /^\/api\/demo\//,
   /^\/api\/public\//,
+  // Anonymous staff-access entry points: no session exists to forge (join
+  // creates one, like /api/login).
+  /^\/api\/staff\/public\//,
 ];
 
 /**

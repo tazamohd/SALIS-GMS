@@ -12,6 +12,12 @@ const PUBLIC_ROUTES: Array<string | RegExp> = [
   "/api/garage-applications",
   // Public customer signup for the marketplace (creates the session itself).
   "/api/customer/register",
+  // Staff access, anonymous half: validating an invite code, redeeming it, and
+  // applying to a workplace all happen BEFORE the applicant has any account.
+  // Everything under /staff/public/ is deliberately anonymous; the
+  // business-side management endpoints live outside this prefix and stay
+  // authenticated.
+  /^\/api\/staff\/public\/.*/,
   // Public marketplace browsing (provider directory + smart search) — a
   // customer can look before creating an account.
   /^\/api\/marketplace\/.*/,
