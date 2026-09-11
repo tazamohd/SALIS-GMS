@@ -1,0 +1,53 @@
+# Default-deny, then explicit allows. The monolith isn't on this cluster yet
+# (still Docker/Railway/Render — see docs/02-technical/deployment-guide.md),
+# so ingress is scoped to "anything in-cluster on port 4100" rather than a
+# specific caller label; tighten to a namespaceSelector once the monolith (or
+# an API gateway in front of it) actually lives in-cluster.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dispatch-default-deny
+  namespace: salis-dispatch
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress", "Egress"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dispatch-allow-ingress
+  namespace: salis-dispatch
+spec:
+  podSelector:
+    matchLabels:
+      app: dispatch
+  policyTypes: ["Ingress"]
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 4100
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dispatch-allow-egress
+  namespace: salis-dispatch
+spec:
+  podSelector:
+    matchLabels:
+      app: dispatch
+  policyTypes: ["Egress"]
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Its own Postgres (adjust selector/CIDR to match wherever
+    # DISPATCH_DATABASE_URL actually points — in-cluster or managed).
+    - ports:
+        - protocol: TCP
+          port: 5432

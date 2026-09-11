@@ -23,5 +23,35 @@ services:
       timeout: 5s
       retries: 5
 
+  # First extracted microservice (see docs/02-technical/adr/ADR-001). Owns
+  # its own database — never shares a schema with `db` above.
+  dispatch:
+    build: ./services/dispatch
+    ports:
+      - "4100:4100"
+    environment:
+      DISPATCH_DATABASE_URL: postgresql://postgres:postgres@dispatch-db:5432/salis_dispatch
+      PORT: "4100"
+    depends_on:
+      dispatch-db:
+        condition: service_healthy
+
+  dispatch-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: salis_dispatch
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - dispatch_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   pgdata:
+  dispatch_pgdata:

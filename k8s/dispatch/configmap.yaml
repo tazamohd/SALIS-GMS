@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dispatch-config
+  namespace: salis-dispatch
+  labels:
+    app: dispatch
+data:
+  PORT: "4100"
+  NODE_ENV: "production"
