@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dispatch
+  namespace: salis-dispatch
+  labels:
+    app: dispatch
+    app.kubernetes.io/part-of: salis-auto
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: dispatch
+  template:
+    metadata:
+      labels:
+        app: dispatch
+    spec:
+      serviceAccountName: dispatch-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+      containers:
+        - name: dispatch
+          # Pin to a real tag on every deploy — never `latest`.
+          image: salis/dispatch:REPLACE_WITH_TAG
+          ports:
+            - containerPort: 4100
+              name: http
+          envFrom:
+            - configMapRef:
+                name: dispatch-config
+            - secretRef:
+                name: dispatch-secrets
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          # Express needs somewhere writable for npm/tmp even with a
+          # read-only rootfs — mount a small tmpfs.
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}

@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import { z } from "zod";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { isAuthenticated } from "../auth";
 import { db } from "../db";
@@ -17,6 +18,7 @@ import {
   insertFleetMaintenanceRecordSchema,
   insertFuelTransactionSchema,
 } from "@shared/schema/index";
+import { requestAssignment, type DispatchCandidate } from "../clients/dispatchClient";
 
 const router = Router();
 
@@ -302,5 +304,88 @@ router.get("/fleet/accounts/:accountId/documents/expiring", isAuthenticated, asy
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+// ── Dispatch (first consumer of the extracted Dispatch service) ────
+// See docs/02-technical/adr/ADR-001-dispatch-service-extraction.md. This
+// endpoint resolves candidates (drivers under the fleet account) itself and
+// sends the resolved list to Dispatch — Dispatch never queries this DB.
+// Returns a recommendation only; it does not mutate any fleet data.
+
+const dispatchAssignSchema = z.object({
+  taskType: z.string().default("fleet_trip"),
+  entityId: z.string(),
+  requiredSkills: z.array(z.string()).default([]),
+  estimatedHours: z.number().optional(),
+  priority: z.enum(["low", "medium", "high", "urgent"]).default("medium"),
+});
+
+router.post(
+  "/fleet/accounts/:accountId/dispatch/assign",
+  isAuthenticated,
+  async (req: Request, res: Response) => {
+    try {
+      const parsed = dispatchAssignSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ message: "Validation failed", errors: parsed.error.flatten() });
+        return;
+      }
+      const { taskType, entityId, requiredSkills, estimatedHours, priority } = parsed.data;
+
+      const drivers = await db
+        .select()
+        .from(fleetDrivers)
+        .where(
+          and(
+            eq(fleetDrivers.fleetAccountId, req.params.accountId),
+            eq(fleetDrivers.status, "active"),
+          ),
+        );
+
+      if (drivers.length === 0) {
+        res.status(404).json({ message: "No active drivers found for this fleet account" });
+        return;
+      }
+
+      const activeTripCounts = await db
+        .select({
+          driverId: fleetTrips.driverId,
+          count: sql<number>`count(*)::int`,
+        })
+        .from(fleetTrips)
+        .where(eq(fleetTrips.status, "in_progress"))
+        .groupBy(fleetTrips.driverId);
+      const loadByDriver = new Map(
+        activeTripCounts
+          .filter((r: { driverId: string | null; count: number }) => r.driverId !== null)
+          .map((r: { driverId: string | null; count: number }) => [r.driverId as string, r.count]),
+      );
+
+      const candidates: DispatchCandidate[] = drivers.map((d: typeof drivers[number]) => ({
+        id: d.id,
+        name: d.userId, // display name resolution happens client-side from userId
+        skills: d.licenseType ? [d.licenseType] : [],
+        currentLoad: loadByDriver.get(d.id) ?? 0,
+        maxLoad: 3,
+        available: d.status === "active",
+        efficiency: 0.8,
+      }));
+
+      const result = await requestAssignment({
+        entityType: "fleet_trip",
+        entityId,
+        taskType,
+        requiredSkills,
+        estimatedHours,
+        priority,
+        candidates,
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error("Fleet dispatch assign error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+);
 
 export const fleetRoutes = router;
