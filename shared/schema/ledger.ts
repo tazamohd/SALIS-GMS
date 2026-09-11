@@ -76,7 +76,7 @@ export const accountBalances = pgTable(
     accountId: uuid("account_id")
       .primaryKey()
       .references(() => accounts.id),
-    balance: bigint("balance", { mode: "bigint" }).notNull().default(BigInt(0)),
+    balance: bigint("balance", { mode: "bigint" }).notNull().default(sql`0`),
     lastTxnId: uuid("last_txn_id").references(() => ledgerTransactions.id),
     updatedAt: timestamp("updated_at").defaultNow(),
   },

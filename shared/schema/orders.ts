@@ -58,7 +58,7 @@ export const orderItems = pgTable(
       .references(() => orders.id, { onDelete: "cascade" }),
     serviceId: uuid("service_id").references(() => servicesCatalog.id),
     description: text("description"),
-    quantity: bigint("quantity", { mode: "bigint" }).notNull().default(BigInt(1)),
+    quantity: bigint("quantity", { mode: "bigint" }).notNull().default(sql`1`),
     unitPrice: bigint("unit_price", { mode: "bigint" }).notNull(), // minor units
     currency: text("currency").notNull().default("SAR"),
     createdAt: timestamp("created_at").defaultNow(),

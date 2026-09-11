@@ -19,9 +19,20 @@ import { accounts } from "./ledger";
 
 // Fleet management domain (Wave 2). All fleet tables reference the shared
 // rails — they never duplicate identity, wallet, notifications, or orders.
+//
+// Naming: this is a DIFFERENT domain from the monolith's existing
+// "fleet_accounts"/"fleet_vehicles" tables (shared/schema.ts) — those back a
+// garage's B2B fleet-customer CRM (contracts, pricing tiers, maintenance
+// schedules). This module is the super-app's operational fleet mini-app
+// (registry, telematics, trips, geofencing, driver dispatch). The "Ops"
+// suffix on fleetOpsAccounts/fleetOpsVehicles exists solely to avoid a SQL
+// table-name collision with the pre-existing tables — a `drizzle-kit push`
+// with both unprefixed found the physical tables already occupied by the
+// legacy feature and silently altered them, breaking it. Never reuse the
+// bare fleet_accounts/fleet_vehicles table names here.
 
-export const fleetAccounts = pgTable(
-  "fleet_accounts",
+export const fleetOpsAccounts = pgTable(
+  "fleet_ops_accounts",
   {
     id: uuid("id")
       .primaryKey()
@@ -46,15 +57,15 @@ export const fleetAccounts = pgTable(
   }),
 );
 
-export const fleetVehicles = pgTable(
-  "fleet_vehicles",
+export const fleetOpsVehicles = pgTable(
+  "fleet_ops_vehicles",
   {
     id: uuid("id")
       .primaryKey()
       .default(sql`gen_random_uuid()`),
     fleetAccountId: uuid("fleet_account_id")
       .notNull()
-      .references(() => fleetAccounts.id),
+      .references(() => fleetOpsAccounts.id),
     plateNumber: text("plate_number").notNull(),
     plateType: text("plate_type"), // private | transport | taxi | diplomatic
     vin: text("vin"),
@@ -92,12 +103,12 @@ export const fleetDrivers = pgTable(
       .default(sql`gen_random_uuid()`),
     fleetAccountId: uuid("fleet_account_id")
       .notNull()
-      .references(() => fleetAccounts.id),
+      .references(() => fleetOpsAccounts.id),
     userId: varchar("user_id")
       .notNull()
       .references(() => users.id),
     assignedVehicleId: uuid("assigned_vehicle_id").references(
-      () => fleetVehicles.id,
+      () => fleetOpsVehicles.id,
     ),
     licenseNumber: text("license_number"),
     licenseExpiryDate: date("license_expiry_date"),
@@ -124,7 +135,7 @@ export const telematicsEvents = pgTable(
       .default(sql`gen_random_uuid()`),
     vehicleId: uuid("vehicle_id")
       .notNull()
-      .references(() => fleetVehicles.id),
+      .references(() => fleetOpsVehicles.id),
     eventType: text("event_type").notNull(),
     // gps | ignition_on | ignition_off | speeding | harsh_brake | geofence_enter | geofence_exit | fuel_level | dtc
     latitude: text("latitude"),
@@ -151,7 +162,7 @@ export const fleetTrips = pgTable(
       .default(sql`gen_random_uuid()`),
     vehicleId: uuid("vehicle_id")
       .notNull()
-      .references(() => fleetVehicles.id),
+      .references(() => fleetOpsVehicles.id),
     driverId: uuid("driver_id").references(() => fleetDrivers.id),
     status: text("status").notNull().default("in_progress"),
     // in_progress | completed | cancelled
@@ -180,7 +191,7 @@ export const fleetGeofences = pgTable(
       .default(sql`gen_random_uuid()`),
     fleetAccountId: uuid("fleet_account_id")
       .notNull()
-      .references(() => fleetAccounts.id),
+      .references(() => fleetOpsAccounts.id),
     name: text("name").notNull(),
     nameAr: text("name_ar"),
     type: text("type").notNull().default("circle"),
@@ -206,7 +217,7 @@ export const fleetMaintenanceRecords = pgTable(
       .default(sql`gen_random_uuid()`),
     vehicleId: uuid("vehicle_id")
       .notNull()
-      .references(() => fleetVehicles.id),
+      .references(() => fleetOpsVehicles.id),
     type: text("type").notNull(),
     // scheduled | unscheduled | recall | inspection
     description: text("description"),
@@ -238,7 +249,7 @@ export const fuelTransactions = pgTable(
       .default(sql`gen_random_uuid()`),
     vehicleId: uuid("vehicle_id")
       .notNull()
-      .references(() => fleetVehicles.id),
+      .references(() => fleetOpsVehicles.id),
     driverId: uuid("driver_id").references(() => fleetDrivers.id),
     fuelType: text("fuel_type").notNull(), // gasoline_91 | gasoline_95 | diesel
     liters: integer("liters").notNull(),
@@ -265,7 +276,7 @@ export const fleetDocuments = pgTable(
       .default(sql`gen_random_uuid()`),
     fleetAccountId: uuid("fleet_account_id")
       .notNull()
-      .references(() => fleetAccounts.id),
+      .references(() => fleetOpsAccounts.id),
     entityType: text("entity_type").notNull(), // vehicle | driver
     entityId: uuid("entity_id").notNull(),
     documentType: text("document_type").notNull(),
@@ -288,17 +299,17 @@ export const fleetDocuments = pgTable(
 );
 
 // Types and Zod schemas
-export type FleetAccount = typeof fleetAccounts.$inferSelect;
-export type InsertFleetAccount = typeof fleetAccounts.$inferInsert;
-export const insertFleetAccountSchema = createInsertSchema(fleetAccounts).omit({
+export type FleetOpsAccount = typeof fleetOpsAccounts.$inferSelect;
+export type InsertFleetOpsAccount = typeof fleetOpsAccounts.$inferInsert;
+export const insertFleetOpsAccountSchema = createInsertSchema(fleetOpsAccounts).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export type FleetVehicle = typeof fleetVehicles.$inferSelect;
-export type InsertFleetVehicle = typeof fleetVehicles.$inferInsert;
-export const insertFleetVehicleSchema = createInsertSchema(fleetVehicles).omit({
+export type FleetOpsVehicle = typeof fleetOpsVehicles.$inferSelect;
+export type InsertFleetOpsVehicle = typeof fleetOpsVehicles.$inferInsert;
+export const insertFleetOpsVehicleSchema = createInsertSchema(fleetOpsVehicles).omit({
   id: true,
   createdAt: true,
   updatedAt: true,

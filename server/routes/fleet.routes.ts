@@ -4,16 +4,16 @@ import { eq, and, desc, sql } from "drizzle-orm";
 import { isAuthenticated } from "../auth";
 import { db } from "../db";
 import {
-  fleetAccounts,
-  fleetVehicles,
+  fleetOpsAccounts,
+  fleetOpsVehicles,
   fleetDrivers,
   fleetMaintenanceRecords,
   telematicsEvents,
   fleetTrips,
   fleetDocuments,
   fuelTransactions,
-  insertFleetAccountSchema,
-  insertFleetVehicleSchema,
+  insertFleetOpsAccountSchema,
+  insertFleetOpsVehicleSchema,
   insertFleetDriverSchema,
   insertFleetMaintenanceRecordSchema,
   insertFuelTransactionSchema,
@@ -28,9 +28,9 @@ router.get("/fleet/accounts", isAuthenticated, async (req: Request, res: Respons
   try {
     const rows = await db
       .select()
-      .from(fleetAccounts)
-      .where(eq(fleetAccounts.status, "active"))
-      .orderBy(desc(fleetAccounts.createdAt));
+      .from(fleetOpsAccounts)
+      .where(eq(fleetOpsAccounts.status, "active"))
+      .orderBy(desc(fleetOpsAccounts.createdAt));
     res.json(rows);
   } catch (error) {
     console.error("Fleet accounts list error:", error);
@@ -40,12 +40,12 @@ router.get("/fleet/accounts", isAuthenticated, async (req: Request, res: Respons
 
 router.post("/fleet/accounts", isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const parsed = insertFleetAccountSchema.safeParse(req.body);
+    const parsed = insertFleetOpsAccountSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ message: "Validation failed", errors: parsed.error.flatten() });
       return;
     }
-    const [account] = await db.insert(fleetAccounts).values(parsed.data).returning();
+    const [account] = await db.insert(fleetOpsAccounts).values(parsed.data).returning();
     res.status(201).json(account);
   } catch (error) {
     console.error("Fleet account create error:", error);
@@ -57,8 +57,8 @@ router.get("/fleet/accounts/:id", isAuthenticated, async (req: Request, res: Res
   try {
     const [account] = await db
       .select()
-      .from(fleetAccounts)
-      .where(eq(fleetAccounts.id, req.params.id));
+      .from(fleetOpsAccounts)
+      .where(eq(fleetOpsAccounts.id, req.params.id));
     if (!account) { res.status(404).json({ message: "Fleet account not found" }); return; }
     res.json(account);
   } catch (error) {
@@ -73,9 +73,9 @@ router.get("/fleet/accounts/:accountId/vehicles", isAuthenticated, async (req: R
   try {
     const rows = await db
       .select()
-      .from(fleetVehicles)
-      .where(eq(fleetVehicles.fleetAccountId, req.params.accountId))
-      .orderBy(desc(fleetVehicles.createdAt));
+      .from(fleetOpsVehicles)
+      .where(eq(fleetOpsVehicles.fleetAccountId, req.params.accountId))
+      .orderBy(desc(fleetOpsVehicles.createdAt));
     res.json(rows);
   } catch (error) {
     console.error("Fleet vehicles list error:", error);
@@ -85,7 +85,7 @@ router.get("/fleet/accounts/:accountId/vehicles", isAuthenticated, async (req: R
 
 router.post("/fleet/accounts/:accountId/vehicles", isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const parsed = insertFleetVehicleSchema.safeParse({
+    const parsed = insertFleetOpsVehicleSchema.safeParse({
       ...req.body,
       fleetAccountId: req.params.accountId,
     });
@@ -93,7 +93,7 @@ router.post("/fleet/accounts/:accountId/vehicles", isAuthenticated, async (req: 
       res.status(400).json({ message: "Validation failed", errors: parsed.error.flatten() });
       return;
     }
-    const [vehicle] = await db.insert(fleetVehicles).values(parsed.data).returning();
+    const [vehicle] = await db.insert(fleetOpsVehicles).values(parsed.data).returning();
     res.status(201).json(vehicle);
   } catch (error) {
     console.error("Fleet vehicle create error:", error);
@@ -105,8 +105,8 @@ router.get("/fleet/vehicles/:id", isAuthenticated, async (req: Request, res: Res
   try {
     const [vehicle] = await db
       .select()
-      .from(fleetVehicles)
-      .where(eq(fleetVehicles.id, req.params.id));
+      .from(fleetOpsVehicles)
+      .where(eq(fleetOpsVehicles.id, req.params.id));
     if (!vehicle) { res.status(404).json({ message: "Vehicle not found" }); return; }
     res.json(vehicle);
   } catch (error) {
@@ -118,9 +118,9 @@ router.get("/fleet/vehicles/:id", isAuthenticated, async (req: Request, res: Res
 router.patch("/fleet/vehicles/:id", isAuthenticated, async (req: Request, res: Response) => {
   try {
     const [updated] = await db
-      .update(fleetVehicles)
+      .update(fleetOpsVehicles)
       .set({ ...req.body, updatedAt: sql`now()` })
-      .where(eq(fleetVehicles.id, req.params.id))
+      .where(eq(fleetOpsVehicles.id, req.params.id))
       .returning();
     if (!updated) { res.status(404).json({ message: "Vehicle not found" }); return; }
     res.json(updated);

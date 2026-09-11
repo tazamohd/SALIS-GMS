@@ -40,7 +40,9 @@
  * - catalog.ts: providers, servicesCatalog, providerServices
  * - orders.ts: orders (super_orders), orderItems, orderEvents
  * - notifications-ext.ts: deviceTokens, notificationPrefs
- * - fleet.ts: fleetAccounts, fleetVehicles, fleetDrivers, telematicsEvents,
+ * - fleet.ts: fleetOpsAccounts, fleetOpsVehicles (named "Ops" to avoid
+ *             colliding with the existing fleet_accounts/fleet_vehicles
+ *             B2B-CRM tables above), fleetDrivers, telematicsEvents,
  *             fleetTrips, fleetGeofences, fleetMaintenanceRecords,
  *             fuelTransactions, fleetDocuments
  * - index.ts: barrel re-export of all shared-rail modules

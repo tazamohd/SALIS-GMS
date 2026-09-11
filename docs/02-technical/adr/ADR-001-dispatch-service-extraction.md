@@ -50,7 +50,7 @@ record an assignment decision."**
 **Dispatch does NOT own:**
 - Technicians, drivers, vehicles, job cards, fleet trips, garages — these
   stay in the monolith's tables (`users`, `technicianProfiles`, `jobCards`,
-  `fleetDrivers`, `fleetVehicles`, `fleetTrips`, …). Dispatch never queries
+  `fleetDrivers`, `fleetOpsVehicles`, `fleetTrips`, …). Dispatch never queries
   the monolith's database directly (no shared schema).
 
 This keeps Dispatch's data model generic (`Candidate`, `Task`) rather than
