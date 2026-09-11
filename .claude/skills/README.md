@@ -46,10 +46,21 @@ Claude activates a skill automatically when a request matches its description/tr
 ### AI
 - **prompt-engineer** — OpenAI integration prompting
 
+### Super-app platform (added for the multi-service evolution)
+- **flutter-expert** — Flutter/Dart cross-platform mobile as an alternative to
+  React Native for the consumer/provider apps
+- **kubernetes-specialist** — K8s manifests, Helm, RBAC/NetworkPolicy, GitOps
+  for when the dispatch/telematics services are extracted and need orchestration
+  beyond Docker Compose
+- **microservices-architect** — service boundaries, DDD, saga/event sourcing,
+  CQRS — for decomposing the monolith once the dispatch engine (and later
+  fleet/roadside) is extracted per the super-app architecture
+- **ml-pipeline** — MLflow/Kubeflow/Feast pipeline infra for the `data-ai-lead`
+  agent's pricing, fraud, and demand-forecasting workloads
+
 ## Adding more
 
 The upstream repo has 66 skills. Framework experts for stacks this project does
-not use (Angular, Django, Rails, NestJS, Spring, .NET, Go, Rust, PHP, Vue,
-Flutter, etc.) and unused infra/data tooling (Terraform, Kubernetes, Spark,
-pandas, ML pipelines) were intentionally omitted. To add one, copy its folder
-from the upstream repo into this directory.
+not use (Angular, Django, Rails, NestJS, Spring, .NET, Go, Rust, PHP, Vue, etc.)
+and unused infra/data tooling (Terraform, Spark, pandas) remain omitted. To add
+one, copy its folder from the upstream repo into this directory.
