@@ -49,6 +49,9 @@ import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import WelcomePage from "@/pages/WelcomePage";
 import PublicTracking from "@/pages/PublicTracking";
+import PublicPortalLanding from "@/pages/PublicPortalLanding";
+import PublicPortalVerify from "@/pages/PublicPortalVerify";
+import PublicPortalJob from "@/pages/PublicPortalJob";
 import Calendar from "@/pages/Calendar";
 import FinancialSettings from "@/pages/FinancialSettings";
 import CurrencySettings from "@/pages/CurrencySettings";
@@ -300,6 +303,9 @@ function Router() {
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/track/:token" component={PublicTracking} />
+        <Route path="/public-portal/landing" component={PublicPortalLanding} />
+        <Route path="/public-portal/verify" component={PublicPortalVerify} />
+        <Route path="/public-portal/job" component={PublicPortalJob} />
         <Route path="/customer-portal" component={CustomerPortal} />
         <Route component={Login} />
       </Switch>
@@ -317,6 +323,11 @@ function Router() {
           <Dashboard />
         </Layout>
       </Route>
+
+      {/* Public portal — OTP-gated, so it is reachable signed in or out */}
+      <Route path="/public-portal/landing" component={PublicPortalLanding} />
+      <Route path="/public-portal/verify" component={PublicPortalVerify} />
+      <Route path="/public-portal/job" component={PublicPortalJob} />
 
       {/* Customer Portal Routes */}
       <Route path="/portal/dashboard">
