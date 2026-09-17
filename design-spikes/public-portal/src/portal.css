@@ -1,0 +1,122 @@
+/* SALIS AUTO — public portal, shared layer.
+   Tokens, base, header, buttons, form fields, error state, footer.
+   Anything used by only one page stays in that page. */
+
+:root{
+  --blue:#0A5ED7; --blue-hover:#0952C0; --bright:#0BB3FF; --navy:#0B1F3B; --navy-2:#1E3A5F;
+  --orange:#F97316; --orange-hover:#EA580C;
+  --grad:linear-gradient(135deg,#0A5ED7 0%,#0BB3FF 100%);
+  --page:#F4F6F9; --card:#FFFFFF; --inset:#E9EEF4; --border:#D9DFE7; --border-strong:#C3CBD6;
+  --heading:#0B1F3B; --body:#2A2F3A; --muted:#64748B; --faint:#94A3B8;
+  --chip:#E9F0FB; --chip-fg:#173963; --chip-o:#FFF1E8; --chip-o-fg:#C2410C;
+  --chip-g:#E4F5EC; --chip-g-fg:#166534;
+  /* Error state — not in the source design, which specifies no failure styling. */
+  --danger:#B91C1C; --danger-bg:#FEF2F2; --danger-line:#FECACA;
+  --band:#0B1F3B; --band-fg:#FFFFFF; --band-muted:#B7C4D6; --band-line:rgba(255,255,255,.14);
+  --shadow:0 12px 32px -14px rgba(11,31,59,.28); --shadow-lg:0 30px 60px -24px rgba(11,31,59,.45);
+  --f-display:'Montserrat','Noto Sans Arabic','Inter',system-ui,sans-serif;
+  --f-ui:'Inter','Noto Sans Arabic',system-ui,-apple-system,sans-serif;
+  --f-action:'Poppins','Noto Sans Arabic','Inter',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+  --f-ar:'Noto Sans Arabic','Inter',sans-serif;
+  --ease:cubic-bezier(.23,1,.32,1);
+  --r-1:8px; --r-2:12px; --r-3:18px;
+}
+
+/* base */
+*{box-sizing:border-box}
+/* The UA's [hidden] rule is display:none with no specificity, so any author rule that
+   sets display — .btn{display:inline-flex}, .grid{display:grid} — silently defeats it.
+   Every el.hidden = true in this codebase means "gone", so make that stick. */
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--page);color:var(--body);font-family:var(--f-ui);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+html[lang="ar"] body,html[dir="rtl"] body{font-family:var(--f-ar);font-size:16px;line-height:1.75}
+h1,h2,h3{font-family:var(--f-display);color:var(--heading);margin:0;letter-spacing:-.02em;text-wrap:balance}
+html[dir="rtl"] h1,html[dir="rtl"] h2,html[dir="rtl"] h3{font-family:var(--f-ar);letter-spacing:0}
+h1{font-size:clamp(30px,4.4vw,54px);font-weight:800;line-height:1.04;letter-spacing:-.035em}
+h2{font-size:clamp(22px,2.6vw,30px);font-weight:700;line-height:1.2;letter-spacing:-.02em}
+p{margin:0;text-wrap:pretty}
+a{color:var(--blue)}
+a:hover{color:var(--blue-hover)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--bright);font-weight:500}
+html[dir="rtl"] .eyebrow{font-family:var(--f-ar);letter-spacing:0;font-size:13px;font-weight:600}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+:focus-visible{outline:2px solid var(--bright);outline-offset:3px}
+
+/* Skip link. The source design parks this at left:-9999px, which in RTL is not off-screen
+   at all — leftward overflow is scrollable in an RTL document, so it added ~10,000px of
+   page width in Arabic. It also never revealed itself on focus, which is the whole point
+   of a skip link. Clipped properly here, and visible when tabbed to. */
+.skip{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+.skip:focus{position:fixed;top:12px;inset-inline-start:12px;z-index:20;width:auto;height:auto;margin:0;padding:10px 16px;clip:auto;clip-path:none;background:var(--card);color:var(--heading);border:1.5px solid var(--blue);border-radius:999px;font-family:var(--f-action);font-weight:600;font-size:14px;text-decoration:none}
+html[dir="rtl"] .skip:focus{font-family:var(--f-ar)}
+
+/* bilingual visibility — every translated string ships as an en/ar span pair and the
+   active language is chosen here, so switching never re-fetches or re-renders a page */
+[lang]{display:inline}
+html[lang="en"] [data-lang="ar"], html:not([lang="ar"]) [data-lang="ar"]{display:none}
+html[lang="ar"] [data-lang="en"]{display:none}
+[dir="ltr"]{unicode-bidi:isolate}
+
+/* header */
+header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--page) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+header .row{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
+.logo{display:inline-flex;align-items:baseline;gap:.35em;text-decoration:none;color:var(--heading);font-family:var(--f-display);font-weight:800;font-size:18px;letter-spacing:-.02em}
+.logo i{width:.42em;height:.42em;border-radius:50%;background:var(--orange);display:inline-block}
+.logo .badge{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-inline-start:12px;padding-inline-start:12px;border-inline-start:1px solid var(--border-strong)}
+html[dir="rtl"] .logo .badge{font-family:var(--f-ar);letter-spacing:0;font-size:12px}
+.hdr-actions{display:flex;align-items:center;gap:10px}
+.lang{font-family:var(--f-mono);font-size:12.5px;border:1px solid var(--border-strong);background:var(--card);color:var(--heading);border-radius:999px;padding:7px 14px;cursor:pointer;min-height:38px}
+.lang:hover{border-color:var(--blue);color:var(--blue)}
+.signin{font-family:var(--f-action);font-weight:600;font-size:14px;text-decoration:none;color:var(--heading);padding:8px 14px;border-radius:999px}
+.signin:hover{color:var(--blue);background:var(--chip)}
+/* The source design gives the header no mobile treatment, so all four items overflow
+   below ~470px. The badge is the only label that carries no action, so it goes first;
+   everything functional stays reachable. */
+@media (max-width:520px){
+  header .row{gap:8px}
+  .logo .badge{display:none}
+  .signin{padding:8px 8px}
+  .lang{padding:7px 11px}
+}
+@media (max-width:400px){
+  .wrap{padding:0 16px}
+  .logo{font-size:17px}
+  .signin{font-size:13px;padding:8px 4px}
+  .lang{font-size:12px;padding:7px 9px}
+}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:var(--f-action);font-weight:600;font-size:15px;min-height:48px;padding:0 22px;border-radius:999px;text-decoration:none;background:var(--blue);color:#fff;border:0;cursor:pointer;box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 10px 24px -14px rgba(10,94,215,.7);transition:transform .16s var(--ease),background .16s var(--ease)}
+.btn:hover{background:var(--blue-hover);transform:translateY(-1px);color:#fff}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.62;cursor:default}
+.btn:disabled:hover{background:var(--blue);transform:none}
+.btn .arr{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.16);margin-inline-end:-8px;font-size:14px;line-height:1}
+html[dir="rtl"] .btn .arr{transform:scaleX(-1)}
+.btn.ghost{background:transparent;color:var(--heading);border:1.5px solid var(--border-strong);box-shadow:none}
+.btn.ghost:hover{color:var(--blue);border-color:var(--blue);background:transparent}
+
+/* form fields — pages set their own vertical rhythm on .field */
+.field{display:block}
+.field label{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:500}
+html[dir="rtl"] .field label{font-family:var(--f-ar);letter-spacing:0;font-size:12.5px;font-weight:600}
+.field input{width:100%;height:48px;border:1.5px solid var(--border);background:#fff;border-radius:var(--r-2);padding:0 14px;font-family:var(--f-ui);font-size:15px;color:var(--heading);transition:border-color .16s var(--ease),box-shadow .16s var(--ease)}
+html[dir="rtl"] .field input{font-family:var(--f-ar)}
+.field input:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 4px rgba(10,94,215,.14)}
+.field input::placeholder{color:var(--faint);font-family:var(--f-mono);font-size:13.5px}
+.field input[aria-invalid="true"]{border-color:var(--danger)}
+
+/* error state — pages set their own margin */
+.err{margin:0;padding:10px 12px;border-radius:var(--r-2);background:var(--danger-bg);border:1px solid var(--danger-line);color:var(--danger);font-size:13px}
+html[dir="rtl"] .err{font-family:var(--f-ar)}
+
+/* footer */
+footer{background:#fff;border-top:1px solid var(--border);padding:32px 0;color:var(--muted);font-size:13px}
+footer .row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+footer .links{display:flex;gap:18px;flex-wrap:wrap}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--blue)}
+footer .brand{font-family:var(--f-display);font-weight:700;color:var(--heading);font-size:14px}
+html[dir="rtl"] footer .brand{font-family:var(--f-ar)}

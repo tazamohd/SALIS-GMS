@@ -1,0 +1,3 @@
+# Build output — reproduce with `npm run build`.
+dist/
+node_modules/

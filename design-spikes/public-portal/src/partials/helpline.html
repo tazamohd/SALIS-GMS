@@ -1,0 +1,42 @@
+<!--
+  Helpline block — moved off /public-portal/landing.
+
+  Used by the authenticated job view (src/job.html), after the OTP step. That is the first point where a
+  specific workshop is known, so "Call the workshop" can resolve to a real number instead of
+  the `tel:+966` stub it carried on the landing page.
+
+  To drop in:
+    1. Include it: `<!-- include: helpline -->`. Its styles live with the page that uses it —
+       currently src/job.html, under the "helpline" heading.
+    2. Replace the two {{ … }} placeholders with the job's workshop record. They are the only
+       dynamic values in the block.
+
+  COPY:
+    The eyebrow, heading and body were rewritten for an authenticated reader. The designed
+    strings addressed someone who had NOT found their job ("Can't find your job?", "Ask
+    reception to resend the SMS"), which stops making sense once the customer is looking at
+    the job card itself. The two CTA labels are unchanged — they were already correct here.
+
+    The original EN/AR strings remain untouched in the source design, project/Public Portal
+    Landing.dc.html, if this block is ever restored to a pre-auth position.
+
+    Arabic follows the design's existing conventions: masculine imperative ("تحدّث", matching
+    "تابع" / "اعتمد" / "ادفع"), and the paired-negation cadence of "لا تخمين بريد، لا كلمات مرور"
+    in the trust band. Worth a native read before it ships.
+-->
+
+<section class="helpline">
+  <div class="wrap">
+    <div class="box">
+      <div>
+        <div class="eyebrow"><span data-lang="en">Questions about this job?</span><span data-lang="ar">أسئلة عن هذا العمل؟</span></div>
+        <h2 style="color:#fff;margin-top:10px"><span data-lang="en">Talk to the people working on your car.</span><span data-lang="ar">تحدّث مع من يعملون على سيارتك.</span></h2>
+        <p><span data-lang="en">Your service advisor has this job card open in front of them. No queue, no explaining it again.</span><span data-lang="ar">مستشار الخدمة يرى بطاقة العمل هذه أمامه. لا انتظار، لا شرح من جديد.</span></p>
+      </div>
+      <div class="ctas">
+        <a class="btn" href="https://wa.me/{{ workshop.whatsapp_e164 }}" style="background:#fff;color:var(--navy)"><span data-lang="en">Chat on WhatsApp</span><span data-lang="ar">واتساب</span><i class="arr" style="background:var(--chip);color:var(--blue)">→</i></a>
+        <a class="btn ghost-dark" href="tel:{{ workshop.phone_e164 }}"><span data-lang="en">Call the workshop</span><span data-lang="ar">اتصل بالورشة</span></a>
+      </div>
+    </div>
+  </div>
+</section>

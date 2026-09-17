@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<title>SALIS AUTO — Your job</title>
+<meta name="robots" content="noindex">
+<!-- include: head -->
+<style>
+/* job header */
+.jobhead{background:var(--band);color:var(--band-fg);position:relative;overflow:hidden}
+.jobhead::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 440px at 85% -20%,rgba(11,179,255,.2),transparent 60%);pointer-events:none}
+.jobhead .wrap{position:relative;padding-block:32px 36px}
+.jobhead .top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.jobhead h1{color:#fff;font-size:clamp(22px,3.2vw,32px);letter-spacing:-.025em;margin-top:6px}
+.jobhead .ref{font-family:var(--f-mono);font-size:12px;color:var(--band-muted);letter-spacing:.06em}
+html[dir="rtl"] .jobhead .ref{font-family:var(--f-ar);letter-spacing:0;font-size:13px}
+.chip{font-family:var(--f-action);font-weight:600;font-size:12.5px;border-radius:999px;padding:7px 14px;background:var(--chip-o);color:var(--chip-o-fg);white-space:nowrap}
+html[dir="rtl"] .chip{font-family:var(--f-ar)}
+.chip.done{background:var(--chip-g);color:var(--chip-g-fg)}
+.chip.wait{background:var(--chip);color:var(--chip-fg)}
+.jobhead .kv{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 24px;margin-top:24px;padding-top:20px;border-top:1px solid var(--band-line)}
+@media (max-width:760px){.jobhead .kv{grid-template-columns:repeat(2,1fr)}}
+.jobhead .kv div{display:grid;gap:3px}
+.jobhead .kv span{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--band-muted);font-weight:500}
+html[dir="rtl"] .jobhead .kv span{font-family:var(--f-ar);letter-spacing:0;font-size:12px;font-weight:600}
+.jobhead .kv b{color:#fff;font-weight:600;font-size:14.5px}
+
+/* layout */
+.job{padding:36px 0 8px}
+.job .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;align-items:start}
+@media (max-width:960px){.job .grid{grid-template-columns:1fr}}
+.col{display:grid;gap:20px}
+.panel{background:#fff;border:1px solid var(--border);border-radius:var(--r-3);overflow:hidden}
+.panel > h2{font-size:16px;font-weight:700;padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.panel .body{padding:18px 20px}
+.panel .empty{padding:18px 20px;color:var(--muted);font-size:13.5px}
+
+/* timeline — the design's .steps at page scale, plus the signature line */
+.steps{list-style:none;margin:0;padding:6px 20px 10px}
+.steps li{display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:start;padding:13px 0;border-bottom:1px dashed var(--border);font-size:14px}
+.steps li:last-child{border-bottom:0}
+.steps .dot{width:14px;height:14px;border-radius:50%;border:3px solid var(--border-strong);background:#fff;box-sizing:border-box;margin:3px 0 0 6px}
+html[dir="rtl"] .steps .dot{margin:3px 6px 0 0}
+.steps .done .dot{background:var(--blue);border-color:var(--blue)}
+.steps .now .dot{border-color:var(--orange);background:var(--orange);box-shadow:0 0 0 4px rgba(249,115,22,.18)}
+.steps b{font-weight:600;color:var(--heading);display:block}
+.steps .by{color:var(--muted);font-size:12.5px;margin-top:2px}
+.steps .t{color:var(--muted);font-family:var(--f-mono);font-size:11.5px;white-space:nowrap;padding-top:2px}
+html[dir="rtl"] .steps .t{font-family:var(--f-ar);font-size:12.5px}
+.steps .pending b,.steps .pending .t{color:var(--faint)}
+
+/* approvals */
+.ask{background:linear-gradient(135deg,#FFF1E8 0%,#FFE4D0 100%);border:1px solid #FBD3B0;border-radius:var(--r-3);padding:20px;display:grid;gap:8px}
+.ask .k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--chip-o-fg);font-weight:500}
+html[dir="rtl"] .ask .k{font-family:var(--f-ar);letter-spacing:0;font-size:12px;font-weight:600}
+.ask b{font-family:var(--f-display);color:var(--heading);font-size:16px;font-weight:700}
+html[dir="rtl"] .ask b{font-family:var(--f-ar)}
+.ask p{color:#7C4A22;font-size:13.5px}
+.ask .acts{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.ask .btn{min-height:38px;padding:0 16px;font-size:13.5px}
+.ask .settled{font-size:13px;font-weight:600;color:var(--chip-o-fg)}
+
+/* photos */
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:18px 20px}
+@media (max-width:520px){.shots{grid-template-columns:repeat(2,1fr)}}
+.shots a{display:block;border-radius:var(--r-2);overflow:hidden;border:1px solid var(--border);background:var(--inset);text-decoration:none}
+.shots img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--inset)}
+.shots .cap{padding:8px 10px;font-size:12px;color:var(--heading);font-weight:500;line-height:1.35}
+.shots .cap i{display:block;font-style:normal;color:var(--muted);font-family:var(--f-mono);font-size:10.5px;margin-top:3px}
+html[dir="rtl"] .shots .cap i{font-family:var(--f-ar);font-size:12px}
+
+/* history + invoice */
+.rows{list-style:none;margin:0;padding:6px 20px 12px}
+.rows li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px dashed var(--border);font-size:13.5px}
+.rows li:last-child{border-bottom:0}
+.rows b{font-weight:600;color:var(--heading)}
+.rows .meta{color:var(--muted);font-family:var(--f-mono);font-size:11.5px}
+html[dir="rtl"] .rows .meta{font-family:var(--f-ar);font-size:12.5px}
+.total{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 20px;background:var(--inset);border-top:1px solid var(--border)}
+.total .amt{font-family:var(--f-display);font-size:22px;font-weight:800;color:var(--heading)}
+html[dir="rtl"] .total .amt{font-family:var(--f-ar)}
+.total .lbl{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+html[dir="rtl"] .total .lbl{font-family:var(--f-ar);letter-spacing:0;font-size:12px;font-weight:600}
+.docs{display:flex;gap:8px;flex-wrap:wrap;padding:14px 20px}
+.docs a{font-family:var(--f-action);font-weight:600;font-size:13px;color:var(--heading);border:1.5px solid var(--border-strong);border-radius:999px;padding:8px 14px;text-decoration:none}
+html[dir="rtl"] .docs a{font-family:var(--f-ar)}
+.docs a:hover{border-color:var(--blue);color:var(--blue)}
+.panel .pay{margin:0 20px 18px;width:calc(100% - 40px)}
+
+/* loading / failure */
+.state{padding:64px 24px;text-align:center;color:var(--muted);font-size:14px}
+.skel{background:linear-gradient(90deg,var(--inset) 25%,#F4F7FA 37%,var(--inset) 63%);background-size:400% 100%;animation:sweep 1.3s ease infinite;border-radius:var(--r-2)}
+@keyframes sweep{0%{background-position:100% 50%}100%{background-position:0% 50%}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+.skel.line{height:13px;margin:10px 0}
+.skel.block{height:180px}
+.job .err{margin:0 0 16px}
+
+/* helpline — moved here with the block it styles */
+.helpline{padding:52px 0 72px}
+.helpline .box{background:var(--navy);color:#fff;border-radius:24px;padding:40px 44px;display:grid;grid-template-columns:1.4fr auto;gap:32px;align-items:center;position:relative;overflow:hidden}
+.helpline .box::before{content:"";position:absolute;inset:0;background:radial-gradient(400px 240px at 100% 0%,rgba(11,179,255,.2),transparent 60%);pointer-events:none}
+@media (max-width:760px){.helpline .box{grid-template-columns:1fr;padding:32px 28px}}
+.helpline h2{color:#fff;position:relative}
+.helpline p{color:var(--band-muted);margin-top:10px;max-width:56ch;position:relative}
+.helpline .ctas{display:flex;gap:12px;flex-wrap:wrap;position:relative}
+.btn.ghost-dark{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.35);box-shadow:none}
+.btn.ghost-dark:hover{background:rgba(255,255,255,.08);border-color:#fff;color:#fff}
+</style>
+</head>
+<body>
+
+<!-- include: header -->
+
+<main id="main">
+
+<section class="jobhead" id="jobhead" hidden>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="ref"><span data-lang="en">Job card</span><span data-lang="ar">بطاقة العمل</span> · <span class="mono" dir="ltr" id="j-ref"></span> · <span id="j-branch"></span></div>
+        <h1 id="j-vehicle"></h1>
+      </div>
+      <span class="chip" id="j-status"></span>
+    </div>
+    <div class="kv">
+      <div><span data-lang="en">Plate</span><span data-lang="ar">اللوحة</span><b class="mono" dir="ltr" id="j-plate"></b></div>
+      <div><span data-lang="en">Service advisor</span><span data-lang="ar">مستشار الخدمة</span><b id="j-advisor"></b></div>
+      <div><span data-lang="en">Est. delivery</span><span data-lang="ar">التسليم المتوقع</span><b class="mono" dir="ltr" id="j-eta"></b></div>
+      <div><span data-lang="en">Branch</span><span data-lang="ar">الفرع</span><b id="j-branch2"></b></div>
+    </div>
+  </div>
+</section>
+
+<section class="job">
+  <div class="wrap">
+    <p class="err" id="job-error" role="alert" hidden></p>
+
+    <div id="loading" aria-live="polite">
+      <p class="state"><span data-lang="en">Loading your job…</span><span data-lang="ar">جارٍ تحميل عملك…</span></p>
+      <div class="skel block"></div>
+      <div class="skel line" style="width:70%"></div>
+      <div class="skel line" style="width:45%"></div>
+    </div>
+
+    <div class="grid" id="content" hidden>
+      <div class="col">
+        <section class="panel">
+          <h2><span data-lang="en">Progress</span><span data-lang="ar">التقدّم</span></h2>
+          <ol class="steps" id="j-steps"></ol>
+        </section>
+
+        <section class="panel" id="p-photos" hidden>
+          <h2><span data-lang="en">Photos from the bay</span><span data-lang="ar">صور من الخليج</span><span class="ref" id="j-photocount"></span></h2>
+          <div class="shots" id="j-photos"></div>
+        </section>
+      </div>
+
+      <div class="col">
+        <div id="j-approvals"></div>
+
+        <section class="panel" id="p-invoice" hidden>
+          <h2><span data-lang="en">Invoice</span><span data-lang="ar">الفاتورة</span><span class="chip" id="j-invstatus"></span></h2>
+          <div class="total">
+            <span class="lbl"><span data-lang="en">Total incl. VAT</span><span data-lang="ar">الإجمالي شامل الضريبة</span></span>
+            <span class="amt" id="j-invtotal"></span>
+          </div>
+          <div class="docs" id="j-invdocs"></div>
+          <a class="btn pay" id="j-pay" hidden><span data-lang="en">Pay now</span><span data-lang="ar">ادفع الآن</span><i class="arr">→</i></a>
+        </section>
+
+        <section class="panel" id="p-history" hidden>
+          <h2><span data-lang="en">Service history</span><span data-lang="ar">سجل الخدمة</span></h2>
+          <ul class="rows" id="j-history"></ul>
+        </section>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- include: helpline -->
+
+</main>
+
+<!-- include: footer -->
+
+<script src="portal.js"></script>
+<script>
+/* Public portal job view: the authenticated page behind the OTP step.
+
+   Data is fetched rather than server-rendered. The design promises "a live view of your
+   job, not a screenshot from a callback", so the page re-reads its own state while it is
+   open — which a page rendered once at request time cannot do.
+
+   Everything from the API is written with textContent or through Portal.pair. Nothing is
+   interpolated into innerHTML: this renders workshop-entered text (advisor notes, part
+   names, photo captions) to a customer, which is exactly where injected markup would
+   land. */
+(function () {
+  var JOB_ENDPOINT = '/api/public-portal/job';
+  var LANDING_PATH = '/public-portal/landing';
+  var POLL_MS = 30000;
+
+  var loading = document.getElementById('loading');
+  var content = document.getElementById('content');
+  var head = document.getElementById('jobhead');
+  var err = document.getElementById('job-error');
+  var job = null;
+  var busy = 0;
+
+  var MSG = {
+    stale:   { en: 'Your session has expired. Start again.',           ar: 'انتهت صلاحية جلستك. ابدأ من جديد.' },
+    load:    { en: 'We could not load your job. Try again shortly.',   ar: 'تعذّر تحميل عملك. حاول بعد قليل.' },
+    act:     { en: 'That did not go through. Try again.',              ar: 'لم تتم العملية. حاول مجدداً.' },
+    network: { en: 'No connection. Check your network and try again.', ar: 'لا يوجد اتصال. تحقق من الشبكة وحاول مجدداً.' }
+  };
+
+  function showError(m) { Portal.pair(err, m); err.hidden = false; }
+  function clearError() { err.hidden = true; err.textContent = ''; }
+
+  /* Every human-readable string from the API is an {en, ar} pair; identifiers, amounts
+     already formatted for each language, and timestamps come through as given. */
+  function setPair(el, m) { if (m) Portal.pair(el, m); else el.textContent = ''; }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function pairSpan(m) { var s = document.createElement('span'); Portal.pair(s, m); return s; }
+
+  function renderHead(j) {
+    document.getElementById('j-ref').textContent = j.id;
+    setPair(document.getElementById('j-branch'), j.branch);
+    setPair(document.getElementById('j-branch2'), j.branch);
+    document.getElementById('j-vehicle').textContent = j.vehicle;
+    document.getElementById('j-plate').textContent = j.plate;
+    setPair(document.getElementById('j-advisor'), j.advisor);
+    document.getElementById('j-eta').textContent = j.eta || '—';
+    var chip = document.getElementById('j-status');
+    chip.className = 'chip' + (j.status.tone === 'done' ? ' done' : j.status.tone === 'wait' ? ' wait' : '');
+    setPair(chip, j.status.label);
+    head.hidden = false;
+  }
+
+  function renderSteps(stages) {
+    var ol = document.getElementById('j-steps');
+    ol.textContent = '';
+    stages.forEach(function (s) {
+      var li = el('li', s.state);
+      li.appendChild(el('span', 'dot'));
+      var mid = el('div');
+      var b = el('b'); Portal.pair(b, s.label); mid.appendChild(b);
+      /* "Every stage records who signed and when" — the landing page's claim, so the
+         signature is shown, not just the timestamp. */
+      if (s.by) { var by = el('div', 'by'); Portal.pair(by, s.by); mid.appendChild(by); }
+      li.appendChild(mid);
+      var t = el('span', 't');
+      t.setAttribute('dir', 'ltr');
+      if (s.state === 'now' && !s.at) Portal.pair(t, { en: 'now', ar: 'الآن' });
+      else t.textContent = s.at || '—';
+      li.appendChild(t);
+      ol.appendChild(li);
+    });
+  }
+
+  function renderApprovals(items) {
+    var host = document.getElementById('j-approvals');
+    host.textContent = '';
+    (items || []).forEach(function (a) {
+      var card = el('div', 'ask');
+      var kicker = pairSpan(a.status === 'pending'
+        ? { en: 'Waiting on you', ar: 'بانتظارك' }
+        : { en: 'Already answered', ar: 'تمت الإجابة' });
+      kicker.className = 'k';
+      card.appendChild(kicker);
+      var b = el('b'); Portal.pair(b, a.title); card.appendChild(b);
+      if (a.amount) { var amt = el('div'); Portal.pair(amt, a.amount); amt.style.fontWeight = '600'; card.appendChild(amt); }
+      if (a.note) { var p = el('p'); Portal.pair(p, a.note); card.appendChild(p); }
+
+      if (a.status === 'pending') {
+        var acts = el('div', 'acts');
+        acts.appendChild(actionBtn(a, 'approve', 'btn', { en: 'Approve', ar: 'اعتمد' }));
+        acts.appendChild(actionBtn(a, 'decline', 'btn ghost', { en: 'Decline', ar: 'ارفض' }));
+        card.appendChild(acts);
+      } else {
+        var settled = pairSpan(a.status === 'approved'
+          ? { en: 'You approved this.', ar: 'اعتمدتها.' }
+          : { en: 'You declined this.', ar: 'رفضتها.' });
+        settled.className = 'settled';
+        card.appendChild(settled);
+      }
+      host.appendChild(card);
+    });
+  }
+
+  function actionBtn(item, decision, cls, label) {
+    var b = el('button', cls);
+    b.type = 'button';
+    Portal.pair(b, label);
+    b.addEventListener('click', function () {
+      if (b.disabled) return;
+      clearError();
+      /* Disable the pair, not just the one pressed: approve and decline are mutually
+         exclusive and the answer is recorded once. */
+      var pair = b.parentNode.querySelectorAll('button');
+      [].forEach.call(pair, function (x) { x.disabled = true; });
+      busy++;
+      Portal.post(JOB_ENDPOINT + '/approvals/' + encodeURIComponent(item.id), { decision: decision },
+        function () { busy--; load(); },
+        function (status) {
+          busy--;
+          [].forEach.call(pair, function (x) { x.disabled = false; });
+          if (status === 401 || status === 404) return expired();
+          showError(status === 0 ? MSG.network : MSG.act);
+        });
+    });
+    return b;
+  }
+
+  function renderPhotos(photos) {
+    var panel = document.getElementById('p-photos');
+    if (!photos || !photos.length) { panel.hidden = true; return; }
+    document.getElementById('j-photocount').textContent = photos.length;
+    var grid = document.getElementById('j-photos');
+    grid.textContent = '';
+    photos.forEach(function (ph) {
+      var a = el('a');
+      a.href = ph.url; a.target = '_blank'; a.rel = 'noopener';
+      var img = document.createElement('img');
+      img.src = ph.thumb || ph.url;
+      img.loading = 'lazy';
+      img.alt = '';
+      a.appendChild(img);
+      var cap = el('div', 'cap');
+      var c = el('span'); Portal.pair(c, ph.caption); cap.appendChild(c);
+      /* "timestamped, signed by the technician who took them" — both are the point. */
+      var meta = el('i', null, [ph.at, ph.by && (Portal.lang() === 'ar' ? ph.by.ar : ph.by.en)].filter(Boolean).join(' · '));
+      cap.appendChild(meta);
+      a.appendChild(cap);
+      grid.appendChild(a);
+    });
+    panel.hidden = false;
+  }
+
+  function renderHistory(rows) {
+    var panel = document.getElementById('p-history');
+    if (!rows || !rows.length) { panel.hidden = true; return; }
+    var ul = document.getElementById('j-history');
+    ul.textContent = '';
+    rows.forEach(function (r) {
+      var li = el('li');
+      var left = el('div');
+      var b = el('b'); Portal.pair(b, r.summary); left.appendChild(b);
+      var meta = el('div', 'meta');
+      meta.setAttribute('dir', 'ltr');
+      meta.textContent = r.ref + ' · ' + r.date;
+      left.appendChild(meta);
+      li.appendChild(left);
+      if (r.invoice_url) {
+        var a = el('a');
+        a.href = r.invoice_url; a.target = '_blank'; a.rel = 'noopener';
+        Portal.pair(a, { en: 'Invoice', ar: 'الفاتورة' });
+        li.appendChild(a);
+      }
+      ul.appendChild(li);
+    });
+    panel.hidden = false;
+  }
+
+  function renderInvoice(inv) {
+    var panel = document.getElementById('p-invoice');
+    if (!inv) { panel.hidden = true; return; }
+    var chip = document.getElementById('j-invstatus');
+    chip.className = 'chip ' + (inv.status === 'paid' ? 'done' : 'wait');
+    setPair(chip, inv.status === 'paid' ? { en: 'Paid', ar: 'مدفوعة' } : { en: 'Due', ar: 'مستحقة' });
+    setPair(document.getElementById('j-invtotal'), inv.total);
+
+    var docs = document.getElementById('j-invdocs');
+    docs.textContent = '';
+    /* ZATCA Phase 2: the PDF/A-3 and the UBL XML are both part of what the customer is
+       owed, so both are offered, not just a printable copy. */
+    [[inv.pdf_url, { en: 'Download PDF', ar: 'تحميل PDF' }],
+     [inv.xml_url, { en: 'XML (UBL 2.1)', ar: 'ملف XML' }]].forEach(function (d) {
+      if (!d[0]) return;
+      var a = el('a'); a.href = d[0]; a.target = '_blank'; a.rel = 'noopener';
+      Portal.pair(a, d[1]); docs.appendChild(a);
+    });
+
+    var pay = document.getElementById('j-pay');
+    if (inv.status !== 'paid' && inv.pay_url) { pay.href = inv.pay_url; pay.hidden = false; }
+    else { pay.hidden = true; pay.removeAttribute('href'); }
+    panel.hidden = false;
+  }
+
+  function render(data) {
+    job = data;
+    renderHead(data.job);
+    renderSteps(data.stages || []);
+    renderApprovals(data.approvals);
+    renderPhotos(data.photos);
+    renderInvoice(data.invoice);
+    renderHistory(data.history);
+    loading.hidden = true;
+    content.hidden = false;
+  }
+
+  function expired() {
+    showError(MSG.stale);
+    setTimeout(function () { window.location.assign(LANDING_PATH); }, 2500);
+  }
+
+  function load(quiet) {
+    Portal.get(JOB_ENDPOINT, function (data) {
+      if (!data || !data.job) { if (!quiet) showError(MSG.load); return; }
+      clearError();
+      render(data);
+    }, function (status) {
+      if (status === 401 || status === 404) return expired();
+      /* A failed background poll must not replace a page the customer is reading. */
+      if (quiet) return;
+      loading.hidden = true;
+      showError(status === 0 ? MSG.network : MSG.load);
+    });
+  }
+
+  /* Poll only while the tab is visible and nothing is mid-flight, so a refresh can never
+     land underneath someone who has just tapped Approve. */
+  setInterval(function () {
+    if (document.hidden || busy > 0 || !job) return;
+    load(true);
+  }, POLL_MS);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && job && !busy) load(true);
+  });
+
+  /* Photo captions mix a translated string with a timestamp, so they are rebuilt rather
+     than switched by CSS. */
+  Portal.onLangChange(function () { if (job) renderPhotos(job.photos); });
+
+  Portal.init();
+  load();
+})();
+</script>
+
+</body>
+</html>

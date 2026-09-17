@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<title>SALIS AUTO — Enter your code</title>
+<meta name="robots" content="noindex">
+<!-- include: head -->
+<style>
+/* auth band */
+.authcard .eyebrow{color:var(--blue)}
+.authcard .err{margin-top:14px}
+.field{margin-top:22px}
+/* the code field must stay monospace in Arabic — it holds ASCII digits */
+html[dir="rtl"] .field input.code{font-family:var(--f-mono)}
+.auth{background:var(--band);position:relative;overflow:hidden;min-height:calc(100vh - 64px);display:grid;align-items:center}
+.auth::before{content:"";position:absolute;inset:0;background:radial-gradient(1000px 500px at 85% -10%,rgba(11,179,255,.22),transparent 60%),radial-gradient(700px 400px at 0% 100%,rgba(249,115,22,.12),transparent 60%);pointer-events:none}
+.auth .wrap{position:relative;display:grid;justify-items:center;padding-block:56px}
+
+.authcard{background:var(--card);color:var(--body);width:100%;max-width:432px;border-radius:20px;padding:32px;box-shadow:var(--shadow-lg)}
+.authcard h1{font-size:26px;font-weight:800;line-height:1.15;margin-top:10px}
+html[dir="rtl"] .authcard h1{font-family:var(--f-ar)}
+.authcard .sub{color:var(--muted);font-size:13.5px;margin-top:8px}
+.authcard .to{color:var(--heading);font-weight:600}
+
+/* One input, not six boxes: six inputs break `autocomplete="one-time-code"` autofill,
+   paste, and screen-reader flow. The tracking gives the segmented look without the cost.
+   text-indent cancels the trailing letter-space so the digits sit optically centred. */
+.field input.code{width:100%;height:64px;border:1.5px solid var(--border);background:#fff;border-radius:var(--r-2);padding:0 14px;font-family:var(--f-mono);font-size:29px;font-weight:500;letter-spacing:.4em;text-indent:.4em;text-align:center;color:var(--heading);transition:border-color .16s var(--ease),box-shadow .16s var(--ease)}
+.field input.code:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 4px rgba(10,94,215,.14)}
+.field input.code::placeholder{color:var(--faint);font-size:24px}
+.field input.code[aria-invalid="true"]{border-color:var(--danger)}
+
+.authcard .btn{width:100%;margin-top:16px}
+
+.authcard .alt{margin-top:18px;padding-top:16px;border-top:1px solid var(--border);font-size:13px;color:var(--muted);display:grid;gap:8px;justify-items:center;text-align:center}
+.linkbtn{border:0;background:none;padding:0;font-family:var(--f-ui);font-size:13px;font-weight:500;color:var(--blue);cursor:pointer}
+html[dir="rtl"] .linkbtn{font-family:var(--f-ar)}
+.linkbtn:hover:not(:disabled){text-decoration:underline}
+.linkbtn:disabled{color:var(--faint);cursor:default}
+.authcard .alt a{color:var(--blue);text-decoration:none;font-weight:500}
+.authcard .alt a:hover{text-decoration:underline}
+.cool{font-family:var(--f-mono);font-size:12px;color:var(--faint)}
+html[dir="rtl"] .cool{font-family:var(--f-ar);font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- include: header -->
+
+<main id="main">
+<section class="auth">
+  <div class="wrap">
+    <div class="authcard">
+      <div class="eyebrow"><span data-lang="en">Step 2 of 2</span><span data-lang="ar">الخطوة ٢ من ٢</span></div>
+      <h1><span data-lang="en">Enter the code we sent you.</span><span data-lang="ar">أدخل الرمز الذي أرسلناه إليك.</span></h1>
+      <!-- {{ challenge.phone_masked }} — rendered server-side from the challenge cookie, e.g.
+           "+966 50 ••• ••21". Never echo the full number back to the page. -->
+      <p class="sub"><span data-lang="en">Sent by SMS to <span class="to mono" dir="ltr">{{ challenge.phone_masked }}</span>. It expires in 10 minutes.</span><span data-lang="ar">أُرسل برسالة نصية إلى <span class="to mono" dir="ltr">{{ challenge.phone_masked }}</span>. ينتهي خلال ١٠ دقائق.</span></p>
+
+      <form id="verify" novalidate>
+        <div class="field">
+          <label for="code"><span data-lang="en">6-digit code</span><span data-lang="ar">الرمز المكوّن من ٦ أرقام</span></label>
+          <input class="code" id="code" type="text" inputmode="numeric" autocomplete="one-time-code"
+                 maxlength="6" placeholder="······" dir="ltr" autofocus
+                 aria-describedby="code-hint">
+        </div>
+
+        <p class="err" id="verify-error" role="alert" hidden></p>
+
+        <button class="btn" type="submit" id="verify-submit"><span data-v-label><span data-lang="en">Verify and continue</span><span data-lang="ar">تحقق وتابع</span></span><span data-v-pending hidden><span data-lang="en">Checking…</span><span data-lang="ar">جارٍ التحقق…</span></span><i class="arr">→</i></button>
+      </form>
+
+      <div class="alt">
+        <div id="code-hint">
+          <button class="linkbtn" type="button" id="resend" disabled><span data-lang="en">Send a new code</span><span data-lang="ar">أرسل رمزاً جديداً</span></button>
+          <span class="cool" id="cooldown"></span>
+        </div>
+        <div>
+          <span data-lang="en">Wrong number? </span><span data-lang="ar">الرقم غير صحيح؟ </span><a href="/public-portal/landing"><span data-lang="en">Start again</span><span data-lang="ar">ابدأ من جديد</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- include: footer -->
+
+<script src="portal.js"></script>
+<script>
+/* Public portal verify: code entry and resend cooldown.
+   Language toggle and the fetch/redirect helpers live in portal.js.
+
+   The challenge itself lives in the cookie the OTP request set — this page never carries
+   the plate, the job card or the phone number, so nothing identifying sits in the URL. */
+(function () {
+  var VERIFY_ENDPOINT = '/api/public-portal/otp/verify';
+  var RESEND_ENDPOINT = '/api/public-portal/otp/resend';
+  var JOB_PATH = '/public-portal/job';
+  var LANDING_PATH = '/public-portal/landing';
+  var COOLDOWN_S = 45;
+  var CODE_LEN = 6;
+
+  var form = document.getElementById('verify');
+  var input = document.getElementById('code');
+  var submit = document.getElementById('verify-submit');
+  var err = document.getElementById('verify-error');
+  var label = submit.querySelector('[data-v-label]');
+  var pending = submit.querySelector('[data-v-pending]');
+  var resend = document.getElementById('resend');
+  var cooldownEl = document.getElementById('cooldown');
+  var inFlight = false;
+  var autoSent = false;
+  var left = 0;
+
+  var MSG = {
+    short:   { en: 'Enter all 6 digits.',                                  ar: 'أدخل الأرقام الستة كاملة.' },
+    wrong:   { en: 'That code is not right. Check the message and try again.', ar: 'الرمز غير صحيح. راجع الرسالة وحاول مجدداً.' },
+    expired: { en: 'That code has expired. Ask for a new one.',             ar: 'انتهت صلاحية الرمز. اطلب رمزاً جديداً.' },
+    rate:    { en: 'Too many attempts. Try again in a few minutes.',        ar: 'محاولات كثيرة. حاول بعد بضع دقائق.' },
+    stale:   { en: 'This session has expired. Start again.',                ar: 'انتهت صلاحية الجلسة. ابدأ من جديد.' },
+    resent:  { en: 'Could not send a new code. Try again shortly.',         ar: 'تعذّر إرسال رمز جديد. حاول بعد قليل.' },
+    network: { en: 'No connection. Check your network and try again.',      ar: 'لا يوجد اتصال. تحقق من الشبكة وحاول مجدداً.' }
+  };
+
+  function showError(m) { Portal.pair(err, m); err.hidden = false; input.setAttribute('aria-invalid', 'true'); }
+  function clearError() { err.hidden = true; err.textContent = ''; input.removeAttribute('aria-invalid'); }
+
+  /* Accept Arabic-Indic (٠١٢) and Persian (۰۱۲) digits — a Saudi keyboard produces them,
+     and the endpoint wants ASCII. */
+  function normalize(s) {
+    return s.replace(/[٠-٩]/g, function (d) { return String.fromCharCode(d.charCodeAt(0) - 0x0660 + 48); })
+            .replace(/[۰-۹]/g, function (d) { return String.fromCharCode(d.charCodeAt(0) - 0x06F0 + 48); })
+            .replace(/\D/g, '').slice(0, CODE_LEN);
+  }
+
+  input.addEventListener('input', function () {
+    var clean = normalize(input.value);
+    if (clean !== input.value) input.value = clean;
+    if (clean.length < CODE_LEN) { autoSent = false; clearError(); return; }
+    /* Autofill and paste both land a full code at once; submitting for them saves a tap.
+       autoSent stops it firing again on the same value after a rejection. */
+    if (!autoSent && !inFlight) { autoSent = true; send(); }
+  });
+
+  function setPending(on) {
+    inFlight = on;
+    submit.disabled = on;
+    label.hidden = on;
+    pending.hidden = !on;
+  }
+
+  function send() {
+    if (inFlight) return;
+    clearError();
+    if (input.value.length < CODE_LEN) { showError(MSG.short); input.focus(); return; }
+
+    setPending(true);
+    Portal.post(VERIFY_ENDPOINT, { code: input.value },
+      function (d) {
+        /* Stay pending through the navigation: re-enabling here would let a second tap
+           spend another verification attempt mid-redirect. */
+        window.location.assign(Portal.safeNext(d && d.next, JOB_PATH));
+      },
+      function (status) {
+        setPending(false);
+        showError(status === 410 ? MSG.expired
+                : status === 429 ? MSG.rate
+                : (status === 401 || status === 404) ? MSG.stale
+                : status === 0 ? MSG.network
+                : MSG.wrong);
+        input.select();
+      });
+  }
+
+  form.addEventListener('submit', function (e) { e.preventDefault(); autoSent = true; send(); });
+
+  /* Resend cooldown. Starts on load because a code was just sent — offering an instant
+     resend invites a second SMS the customer has not waited for. */
+  function paintCooldown() {
+    if (left > 0) Portal.pair(cooldownEl, { en: 'in ' + left + 's', ar: 'خلال ' + left + ' ثانية' });
+    else cooldownEl.textContent = '';
+  }
+
+  function startCooldown() {
+    left = COOLDOWN_S;
+    resend.disabled = true;
+    paintCooldown();
+    var t = setInterval(function () {
+      left--;
+      paintCooldown();
+      if (left <= 0) { clearInterval(t); resend.disabled = false; }
+    }, 1000);
+  }
+
+  resend.addEventListener('click', function () {
+    if (resend.disabled || inFlight) return;
+    clearError();
+    resend.disabled = true;
+    Portal.post(RESEND_ENDPOINT, {},
+      function () {
+        input.value = ''; autoSent = false; input.focus();
+        startCooldown();
+      },
+      function (status) {
+        if (status === 401 || status === 404) {
+          showError(MSG.stale);
+          setTimeout(function () { window.location.assign(LANDING_PATH); }, 2500);
+          return;
+        }
+        showError(status === 429 ? MSG.rate : status === 0 ? MSG.network : MSG.resent);
+        resend.disabled = false;
+      });
+  });
+
+  /* The countdown is rebuilt from a number, so it has to re-render on a language switch. */
+  Portal.onLangChange(paintCooldown);
+  Portal.init();
+  startCooldown();
+})();
+</script>
+
+</body>
+</html>
