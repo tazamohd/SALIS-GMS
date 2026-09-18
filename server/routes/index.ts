@@ -42,6 +42,7 @@ import { inventoryRoutes } from "./inventory.routes";
 import { technicianRoutes } from "./technicians.routes";
 import { vehicleRoutes } from "./vehicles.routes";
 import { jobCardsRoutes } from "./jobcards.routes";
+import { publicPortalRoutes } from "./public-portal.routes";
 import { invoiceRoutes } from "./invoices.routes";
 import { settingsRoutes } from "./settings.routes";
 // miscRoutes (./misc.routes) intentionally NOT imported: its handlers are all TODO
@@ -114,6 +115,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Set up authentication middleware first (session, passport)
   await setupAuth(app);
+
+  /* Must come AFTER setupAuth: the portal is unauthenticated but session-backed — the OTP
+     challenge and the verified job both live in the session, so it needs the middleware
+     setupAuth installs. The stateless /api/public routes above do not. */
+  app.use("/api", publicPortalRoutes);
   markAuthInitialized();
   console.log("✅ Auth Middleware Initialized");
 

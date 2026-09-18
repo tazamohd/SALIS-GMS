@@ -129,12 +129,10 @@ export default function PublicPortalVerify() {
             <h1 className="mt-2.5 text-[26px] font-extrabold leading-tight text-[#0B1F3B] dark:text-white">
               {t('publicPortal.verify.title', 'Enter the code we sent you.')}
             </h1>
-            {/* The masked number comes from the challenge the server already holds; the
-                full number is never echoed back to the page. */}
+            {/* No phone number, masked or otherwise. The lookup answers identically whether
+                or not it matched, so the server has nothing it can safely say here. */}
             <p className="mt-2 text-[13.5px] text-[#64748B]" data-testid="text-sent-to">
-              {t('publicPortal.verify.sentTo', 'Sent by SMS to {{phone}}. It expires in 10 minutes.', {
-                phone: '•••',
-              })}
+              {t('publicPortal.verify.sentTo', 'We sent a code to the mobile your workshop has on file. It expires in 10 minutes.')}
             </p>
 
             <form onSubmit={onSubmit} noValidate className="mt-6" data-testid="form-verify">
