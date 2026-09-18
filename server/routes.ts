@@ -1348,39 +1348,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   */
 
-  // Public route - Get job status by tracking token (no auth required) — KEPT (not in module)
-  app.get('/api/public/track/:token', async (req, res) => {
-    try {
-      const { token } = req.params;
-      
-      // Hash the token to compare with stored hash
-      const hashedToken = require('crypto').createHash('sha256').update(token).digest('hex');
-      
-      const jobCard = await storage.getJobByTrackingToken(hashedToken);
-      if (!jobCard) {
-        return res.status(404).json({ message: "Invalid or expired tracking link" });
-      }
-      
-      // Get customer-visible tracking events
-      const events = await storage.getJobTrackingEvents(jobCard.id, true);
-      
-      res.json({
-        jobCard: {
-          jobNumber: jobCard.jobNumber,
-          status: jobCard.status,
-          vehicleInfo: jobCard.vehicleInfo,
-          description: jobCard.description,
-          scheduledDate: jobCard.scheduledDate,
-          startedAt: jobCard.startedAt,
-          estimatedCompletionAt: jobCard.estimatedCompletionAt,
-          completedAt: jobCard.completedAt,
-        },
-        events,
-      });
-    } catch (error) {
-      console.error("Error fetching tracking data:", error);
-      res.status(500).json({ message: "Failed to fetch tracking data" });
-    }
+  /**
+   * RETIRED — see the note on POST /api/job-cards/:id/tracking/generate.
+   *
+   * Answers 410 rather than serving job data. Tokens already in customers' hands stop
+   * working here by design: the point of the change is that holding a URL is no longer
+   * proof of identity. /track/:token renders a notice sending them to the portal.
+   */
+  app.get('/api/public/track/:token', async (_req, res) => {
+    res.status(410).json({
+      message: "This tracking link is no longer valid. Look up your job at /public-portal/landing and we will text you a one-time code.",
+      replacement: "/public-portal/landing",
+    });
   });
 
   /* MOVED TO jobcards.routes.ts — continued (tracking events + ETA) */

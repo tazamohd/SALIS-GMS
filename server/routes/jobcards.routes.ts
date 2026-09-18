@@ -343,46 +343,23 @@ router.put("/tasks/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// POST /api/job-cards/:id/tracking/generate - Generate public tracking token
-router.post("/job-cards/:id/tracking/generate", isAuthenticated, async (req: any, res) => {
-  try {
-    const { id } = req.params;
-
-    // Verify job card exists and user has access
-    const jobCard = await storage.getJobCard(id);
-    if (!jobCard) {
-      return res.status(404).json({ message: "Job card not found" });
-    }
-
-    // Verify garage ownership
-    const userGarages = await storage.getUserRoles(req.user?.id);
-    const hasAccess = userGarages.some((ur: any) => ur.garage?.id === jobCard.garageId);
-
-    if (!hasAccess && req.user?.userType !== 'admin') {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
-    const { rawToken, hashedToken, expiresAt } = await storage.generatePublicTrackingToken(id);
-
-    // Create tracking event
-    await storage.createJobTrackingEvent({
-      jobCardId: id,
-      eventType: 'message',
-      title: 'Tracking Link Generated',
-      description: 'Customer tracking link has been generated and can be shared',
-      isVisibleToCustomer: false,
-      createdBy: req.user?.id,
-    });
-
-    res.json({
-      trackingToken: rawToken,
-      trackingUrl: `/track/${rawToken}`,
-      expiresAt
-    });
-  } catch (error) {
-    console.error("Error generating tracking token:", error);
-    res.status(500).json({ message: "Failed to generate tracking token" });
-  }
+/**
+ * RETIRED — public tracking links are replaced by the OTP portal at
+ * /public-portal/landing, where a customer proves identity with a one-time code sent to
+ * the mobile already on file. A token in a URL cannot: an SMS link about a named
+ * customer's car gets forwarded, logged and screenshotted, and whoever holds it is in.
+ *
+ * Kept as a 410 rather than deleted so anything still calling it — an integration, a
+ * stale client bundle — gets told what happened instead of a bare 404.
+ *
+ * Tokens already issued stop working: GET /api/public/track/:token is also 410, and
+ * /track/:token now renders a notice pointing at the portal.
+ */
+router.post("/job-cards/:id/tracking/generate", isAuthenticated, async (_req, res) => {
+  res.status(410).json({
+    message: "Public tracking links are retired. Customers now use the portal at /public-portal/landing, which verifies them with a one-time code.",
+    replacement: "/public-portal/landing",
+  });
 });
 
 // GET /api/job-cards/:id/tracking/events - Get tracking events

@@ -2624,6 +2624,12 @@
     "errRate": "Too many attempts. Try again in a few minutes.",
     "errFailed": "We could not send the code. Check the details and try again.",
     "errNetwork": "No connection. Check your network and try again.",
-    "errStale": "This session has expired. Start again."
+    "errStale": "This session has expired. Start again.",
+    "retired": {
+      "title": "This tracking link has been replaced.",
+      "body": "Your job is still here. Look it up with your plate or job card number and we will text a one-time code to the mobile your workshop has on file — so only you can open it.",
+      "cta": "Find your job",
+      "hint": "You will need the mobile number you gave the workshop."
+    }
   }
 }

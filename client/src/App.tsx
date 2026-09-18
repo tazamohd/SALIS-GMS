@@ -48,7 +48,7 @@ import { PurchaseAgentLayout } from "@/components/PurchaseAgentLayout";
 import Notifications from "@/pages/Notifications";
 import Landing from "@/pages/Landing";
 import WelcomePage from "@/pages/WelcomePage";
-import PublicTracking from "@/pages/PublicTracking";
+import TrackingLinkRetired from "@/pages/TrackingLinkRetired";
 import PublicPortalLanding from "@/pages/PublicPortalLanding";
 import PublicPortalVerify from "@/pages/PublicPortalVerify";
 import PublicPortalJob from "@/pages/PublicPortalJob";
@@ -302,7 +302,9 @@ function Router() {
       <Switch>
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
-        <Route path="/track/:token" component={PublicTracking} />
+        {/* Retired: tracking links are replaced by the OTP portal below. The route
+            stays because the old links are already in customers' phones. */}
+        <Route path="/track/:token" component={TrackingLinkRetired} />
         <Route path="/public-portal/landing" component={PublicPortalLanding} />
         <Route path="/public-portal/verify" component={PublicPortalVerify} />
         <Route path="/public-portal/job" component={PublicPortalJob} />

@@ -805,6 +805,7 @@ export interface IStorage {
   updateJobCard(id: string, data: any): Promise<JobCard>;
   
   // Dynamic Service Tracking - Feature #3
+  /** @deprecated Public tracking links are retired; nothing calls this. */
   generatePublicTrackingToken(jobCardId: string): Promise<{ rawToken: string, hashedToken: string, expiresAt: Date }>;
   getJobByTrackingToken(hashedToken: string): Promise<JobCard | undefined>;
   createJobTrackingEvent(data: InsertJobTrackingEvent): Promise<JobTrackingEvent>;
