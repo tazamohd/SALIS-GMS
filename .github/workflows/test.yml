@@ -47,3 +47,66 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+  # Required by branch protection on main, which has been asking for a check named
+  # "Build, Lint & Test" that no workflow emitted — so it could never report and every
+  # PR sat blocked. This job is that check. It is deliberately self-contained rather
+  # than `needs: test`: branch protection counts a skipped job as satisfied, so a gate
+  # that skips when its dependency fails is a gate that passes when tests fail.
+  build:
+    name: "Build, Lint & Test"
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: slis_gms_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/slis_gms_test
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/slis_gms_test
+      SESSION_SECRET: ci-test-secret-not-used-for-anything-real-just-needs-to-exist
+      NODE_ENV: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run check
+
+      # `npm run lint` is `eslint .`, and the repo carries no eslint.config.* — under
+      # ESLint v9+ that is a hard error, not an empty ruleset. Rather than fail the gate
+      # on a missing config or quietly drop the step, it runs the moment a config lands.
+      - name: Lint
+        run: |
+          if [ -f eslint.config.js ] || [ -f eslint.config.mjs ] || [ -f eslint.config.cjs ]; then
+            npm run lint
+          else
+            echo "::warning title=Lint skipped::No eslint.config.* in the repo; add one and this step starts enforcing it."
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Push Drizzle schema
+        run: npx drizzle-kit push --force
+
+      - name: Run tests
+        run: npm test

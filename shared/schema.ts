@@ -319,6 +319,9 @@ export const jobCards = pgTable("job_cards", {
   estimatedCompletionAt: timestamp("estimated_completion_at"),
   etaLastCalculatedAt: timestamp("eta_last_calculated_at"),
   etaManualOverride: boolean("eta_manual_override").default(false),
+  // DEPRECATED — public tracking links are retired in favour of the OTP portal.
+  // Nothing mints or reads these any more. Kept so the retirement ships without a
+  // destructive migration; drop in a follow-up once no environment needs the history.
   publicTrackingToken: varchar("public_tracking_token", { length: 64 }).unique(), // SHA-256 hash of UUID
   publicTrackingTokenExpiresAt: timestamp("public_tracking_token_expires_at"),
   notes: text("notes"),
